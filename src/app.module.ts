@@ -1,19 +1,12 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import ormConfig = require('./config/ormconfig');
-import { ConfigModule } from '@nestjs/config';
 
-import { initModule } from './api/init/init.module';
-
+import { VideoModule } from './api/video/';
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-      envFilePath: process.env.NODE_ENV === 'dev' ? '.env.prod.dev' : '.env.prod.prod',
-      ignoreEnvFile: process.env.NODE_ENV === 'prod',
-    }),
     TypeOrmModule.forRoot(ormConfig[0]),
-    initModule,
+    VideoModule,
   ],
 })
 export class AppModule {}

@@ -1,8 +1,10 @@
 import { IsEmail } from 'class-validator';
-import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, Unique } from 'typeorm';
-import { AccountRoles, AccountStates } from '@enum/';
+import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, Unique, OneToOne, OneToMany, JoinColumn } from 'typeorm';
+import { AccountRoles, AccountStates } from '@enum/index';
+import { Video } from './video.entity';
+import { Profile } from './user-profile.entity';
 
-@Entity({name: 'user'})
+@Entity({ name: 'user' })
 @Unique(['email'])
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn()
@@ -41,4 +43,12 @@ export class User extends BaseEntity {
 
   @Column({ type: 'timestamp with time zone', nullable: true })
   deletedAt: Date;
+
+  @OneToMany(() => Video, (video) => video.userEmail)
+  @JoinColumn({ name: 'email' })
+  videos: Video;
+
+  @OneToOne(() => Profile)
+  @JoinColumn({ name: 'profile_id' })
+  profile: Profile;
 }

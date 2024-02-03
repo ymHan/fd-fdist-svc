@@ -1,4 +1,5 @@
 export enum RecordType {
-  SHORTS = 'SHORTS',
-  ASSISTS = 'ASSISTS',
+  SHORTS = 'SHORTS', // Replay Video(360)
+  ASSISTS = 'ASSISTS', // Interactive VOD, Multi-View VOD
+  CASTS = 'CASTS', // Multi-View LIVE, Interactive LIVE
 }
