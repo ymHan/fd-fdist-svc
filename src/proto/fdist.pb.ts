@@ -9,8 +9,30 @@ export interface GetVideoByIdRequest {
   id: number;
 }
 
-export interface GetVideoByIdResponse {
-  video: Videos | undefined;
+export interface IdVideo {
+  id: number;
+  email: string;
+  title: string;
+  subTitle: string;
+  description: string;
+  ownerName: string;
+  ownerNickName: string;
+  ownerChannelName: string;
+  ownerProfileIconUrl: string;
+  viewCount: number;
+  reportCount: number;
+  likesCount: number;
+  duration: string;
+  category: string;
+  categorySub: string;
+  categorySubCode: string;
+  recordType: string;
+  contentUrlList: string[];
+  poseIndicatorList: string[];
+  nodeId: string;
+  createdAt: string;
+  updatedAt: string;
+  thumbnailUrl: string;
 }
 
 export interface Videos {
@@ -37,6 +59,13 @@ export interface Videos {
   createdAt: string;
   updatedAt: string;
   thumbnailUrl: string;
+}
+
+export interface GetVideoByIdResponse {
+  result: string;
+  status: number;
+  message: string;
+  data: IdVideo | undefined;
 }
 
 export interface GetVideoListResponse {

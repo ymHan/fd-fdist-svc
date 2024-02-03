@@ -13,4 +13,5 @@ export enum CategorySubEnum {
   NAB = 'NAB', // NAB
   MWC = 'MWC', // MWC
   BALLET = 'BALLET', // 발레
+  DANCE = 'DANCE', // 댄스
 }
