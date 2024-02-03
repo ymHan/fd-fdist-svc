@@ -23,7 +23,15 @@ export class VideoService {
   }
   async getVideoById(payload: GetVideoByIdRequest): Promise<any> {
     const video = await this.videoRepository.findOne({ where: { id: payload.id } });
-    console.log(video);
+
+    if (!video) {
+      return {
+        result: 'fail',
+        status: 404,
+        message: 'not found',
+      }
+    }
+
     return {
       result: 'ok',
       status: 200,
