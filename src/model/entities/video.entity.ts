@@ -52,7 +52,7 @@ export class Video extends BaseEntity {
   viewCount: number; // 조회수
 
   @Column({ default: 0 })
-  reportsCount: number; // 신고 수
+  reportCount: number; // 신고 수
 
   @Column({ default: 0 })
   likesCount: number; // 좋아요 수

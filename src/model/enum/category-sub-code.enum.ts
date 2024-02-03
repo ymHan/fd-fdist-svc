@@ -1,5 +1,5 @@
 export enum CategorySubCodeEnum {
-  BALLET = 'E_BAL', // 발레allet
+  BALLET = 'E_BAL', // 발레
   DANCE = 'E_DAN', // 댄스
   BUSINESS = 'P_BIZ', // 비즈니스
   NAB = 'P_NAB', // NAB
