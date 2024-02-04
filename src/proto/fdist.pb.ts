@@ -5,6 +5,18 @@ import { Empty } from "./google/protobuf/empty.pb";
 
 export const protobufPackage = "fdist";
 
+export interface GetCategorySubResponse {
+  result: string;
+  status: number;
+  message: string;
+  data: GetCategorySubResponse_DATA[];
+}
+
+export interface GetCategorySubResponse_DATA {
+  category: string;
+  categorySubName: string;
+}
+
 export interface GetVideoListRequest {
   cat: string;
   page: number;
@@ -155,6 +167,8 @@ export interface FDistServiceClient {
   getVideos(request: GetVideoListRequest): Observable<GetVideoListResponse>;
 
   getVideoById(request: GetVideoByIdRequest): Observable<GetVideoByIdResponse>;
+
+  getCategorySub(request: Empty): Observable<GetCategorySubResponse>;
 }
 
 export interface FDistServiceController {
@@ -179,6 +193,10 @@ export interface FDistServiceController {
   getVideoById(
     request: GetVideoByIdRequest,
   ): Promise<GetVideoByIdResponse> | Observable<GetVideoByIdResponse> | GetVideoByIdResponse;
+
+  getCategorySub(
+    request: Empty,
+  ): Promise<GetCategorySubResponse> | Observable<GetCategorySubResponse> | GetCategorySubResponse;
 }
 
 export function FDistServiceControllerMethods() {
@@ -191,6 +209,7 @@ export function FDistServiceControllerMethods() {
       "initialize",
       "getVideos",
       "getVideoById",
+      "getCategorySub",
     ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
