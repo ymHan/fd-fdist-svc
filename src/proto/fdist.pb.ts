@@ -5,6 +5,12 @@ import { Empty } from "./google/protobuf/empty.pb";
 
 export const protobufPackage = "fdist";
 
+export interface GetVideoListRequest {
+  cat: string;
+  page: number;
+  limit: number;
+}
+
 export interface GetVideoByIdRequest {
   id: number;
 }
@@ -68,11 +74,18 @@ export interface GetVideoByIdResponse {
   data: IdVideo | undefined;
 }
 
+export interface Meta {
+  total: number;
+  page: number;
+  lastPage: number;
+}
+
 export interface GetVideoListResponse {
   result: string;
   status: number;
   message: string;
   data: Videos[];
+  meta: Meta | undefined;
 }
 
 export interface InitInfoResponse {
@@ -139,7 +152,7 @@ export interface FDistServiceClient {
 
   initialize(request: Empty): Observable<InitInfoResponse>;
 
-  getVideos(request: Empty): Observable<GetVideoListResponse>;
+  getVideos(request: GetVideoListRequest): Observable<GetVideoListResponse>;
 
   getVideoById(request: GetVideoByIdRequest): Observable<GetVideoByIdResponse>;
 }
@@ -159,7 +172,9 @@ export interface FDistServiceController {
 
   initialize(request: Empty): Promise<InitInfoResponse> | Observable<InitInfoResponse> | InitInfoResponse;
 
-  getVideos(request: Empty): Promise<GetVideoListResponse> | Observable<GetVideoListResponse> | GetVideoListResponse;
+  getVideos(
+    request: GetVideoListRequest,
+  ): Promise<GetVideoListResponse> | Observable<GetVideoListResponse> | GetVideoListResponse;
 
   getVideoById(
     request: GetVideoByIdRequest,

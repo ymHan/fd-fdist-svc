@@ -2,8 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Video } from '@entities/index';
-import { GetVideoListResponse, GetVideoByIdRequest, GetVideoByIdResponse } from '@proto/fdist.pb';
-import { VideoRepository } from '@root/model/repositories';
+import { GetVideoByIdRequest, GetVideoListRequest } from '@proto/fdist.pb';
 
 @Injectable()
 export class VideoService {
@@ -12,13 +11,44 @@ export class VideoService {
 
   //constructor(private readonly videoRepository: VideoRepository) {}
 
-  public async getVideos(): Promise<any> {
-    const videos = await this.videoRepository.find();
-    return {
-      result: 'ok',
-      status: 200,
-      message: 'success',
-      data: videos,
+  public async getVideos(payload: GetVideoListRequest): Promise<any> {
+    const cat = payload.cat || 'all';
+    const page = payload.page || 1;
+    const limit = payload.limit || 10;
+
+    if (cat === 'all' || cat === 'ALL' || cat === '' || cat === undefined || cat === null) {
+      const [videos, total] = await this.videoRepository.findAndCount();
+
+      return {
+        result: 'ok',
+        status: 200,
+        message: 'success',
+        data: videos,
+        meta: {
+          total,
+          page,
+          last_page: Math.ceil(total / limit),
+        },
+      };
+    } else {
+      const queryBuilder = this.videoRepository.createQueryBuilder('video');
+      const [videos, total] = await queryBuilder
+        .where('video.categorySub = :cat', { cat })
+        .skip((page - 1) * limit)
+        .take(limit)
+        .getManyAndCount();
+
+      return {
+        result: 'ok',
+        status: 200,
+        message: 'success',
+        data: videos,
+        meta: {
+          total,
+          page,
+          last_page: Math.ceil(total / limit),
+        },
+      };
     }
   }
   async getVideoById(payload: GetVideoByIdRequest): Promise<any> {
@@ -29,7 +59,7 @@ export class VideoService {
         result: 'fail',
         status: 404,
         message: 'not found',
-      }
+      };
     }
 
     return {
@@ -37,6 +67,6 @@ export class VideoService {
       status: 200,
       message: 'success',
       data: video,
-    }
+    };
   }
 }
