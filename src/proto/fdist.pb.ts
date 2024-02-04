@@ -5,6 +5,25 @@ import { Empty } from "./google/protobuf/empty.pb";
 
 export const protobufPackage = "fdist";
 
+export interface ReportVideoRequest {
+  userId: number;
+  videoId: number;
+  reportType: number;
+  report: string;
+}
+
+export interface ReportVideoResponse {
+  result: string;
+  status: number;
+  message: string;
+  data: ReportVideoResponse_DATA[];
+}
+
+export interface ReportVideoResponse_DATA {
+  result?: boolean | undefined;
+  error?: string | undefined;
+}
+
 export interface ToggleLikeRequest {
   userId: number;
   videoId: number;
@@ -189,6 +208,8 @@ export interface FDistServiceClient {
   getCategorySub(request: Empty): Observable<GetCategorySubResponse>;
 
   toggleLike(request: ToggleLikeRequest): Observable<ToggleLikeResponse>;
+
+  reportVideo(request: ReportVideoRequest): Observable<ReportVideoResponse>;
 }
 
 export interface FDistServiceController {
@@ -221,6 +242,10 @@ export interface FDistServiceController {
   toggleLike(
     request: ToggleLikeRequest,
   ): Promise<ToggleLikeResponse> | Observable<ToggleLikeResponse> | ToggleLikeResponse;
+
+  reportVideo(
+    request: ReportVideoRequest,
+  ): Promise<ReportVideoResponse> | Observable<ReportVideoResponse> | ReportVideoResponse;
 }
 
 export function FDistServiceControllerMethods() {
@@ -235,6 +260,7 @@ export function FDistServiceControllerMethods() {
       "getVideoById",
       "getCategorySub",
       "toggleLike",
+      "reportVideo",
     ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);

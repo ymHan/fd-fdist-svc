@@ -2,12 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Video } from '@entities/index';
-import { GetVideoByIdRequest, GetVideoListRequest } from '@proto/fdist.pb';
+import { ReportEntity } from '@entities/report.entity';
+import { GetVideoByIdRequest, GetVideoListRequest, ReportVideoRequest, ReportVideoResponse } from '@proto/fdist.pb';
 
 @Injectable()
 export class VideoService {
   @InjectRepository(Video)
   private readonly videoRepository: Repository<Video>;
+
+  @InjectRepository(ReportEntity)
+  private readonly reportRepository: Repository<ReportEntity>;
 
   //constructor(private readonly videoRepository: VideoRepository) {}
 
@@ -69,6 +73,31 @@ export class VideoService {
       status: 200,
       message: 'success',
       data: video,
+    };
+  }
+
+  async reportVideo(payload: ReportVideoRequest): Promise<ReportVideoResponse> {
+    const report = new ReportEntity();
+    report.userId = payload.userId;
+    report.videoId = payload.videoId;
+    report.reportType = payload.reportType;
+    report.report = payload.report;
+
+    await this.reportRepository.save(report);
+
+    const video = await this.videoRepository.findOne({ where: { id: payload.videoId } });
+    video.reportCount += 1;
+    await this.videoRepository.save(video);
+
+    return {
+      result: 'ok',
+      status: 200,
+      message: 'success',
+      data: [
+        {
+          result: true,
+        },
+      ],
     };
   }
 }
