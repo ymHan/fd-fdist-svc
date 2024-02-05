@@ -5,6 +5,64 @@ import { Empty } from "./google/protobuf/empty.pb";
 
 export const protobufPackage = "fdist";
 
+export interface GetVideoRecordTypeRequest {
+  type: string;
+  page: number;
+  limit: number;
+}
+
+export interface GetVideoRecordTypeResponse {
+  result: string;
+  status: number;
+  message: string;
+  data: GetVideoRecordTypeResponse_DATA[];
+  meta: GetVideoRecordTypeResponse_Meta | undefined;
+}
+
+export interface GetVideoRecordTypeResponse_DATA {
+  id: number;
+  email: string;
+  title: string;
+  subTitle: string;
+  description: string;
+  ownerName: string;
+  ownerNickName: string;
+  ownerChannelName: string;
+  ownerProfileIconUrl: string;
+  viewCount: number;
+  reportCount: number;
+  likesCount: number;
+  duration: string;
+  category: string;
+  categorySub: string;
+  categorySubCode: string;
+  recordType: string;
+  contentUrlList: string[];
+  poseIndicatorList: string[];
+  nodeId: string;
+  createdAt: string;
+  updatedAt: string;
+  thumbnailUrl: string;
+}
+
+export interface GetVideoRecordTypeResponse_Meta {
+  total: number;
+  page: number;
+  lastPage: number;
+}
+
+export interface GetRecordTypeResponse {
+  result: string;
+  status: number;
+  message: string;
+  data: GetRecordTypeResponse_DATA[];
+}
+
+export interface GetRecordTypeResponse_DATA {
+  index: number;
+  recordType: string;
+}
+
 export interface GetVideoCategoryRequest {
   caty: string;
 }
@@ -215,8 +273,6 @@ export interface ContentItem {
 export const FDIST_PACKAGE_NAME = "fdist";
 
 export interface FDistServiceClient {
-  getCategory(request: Empty): Observable<GetCategoryResponse>;
-
   getContent(request: GetContentRequest): Observable<GetContentResponse>;
 
   videoRecording(request: VideoRecordingRequest): Observable<VideoRecordingResponse>;
@@ -231,7 +287,13 @@ export interface FDistServiceClient {
 
   getVideoCategory(request: GetVideoCategoryRequest): Observable<GetVideoCategoryResponse>;
 
+  getVideoRecordType(request: GetVideoRecordTypeRequest): Observable<GetVideoRecordTypeResponse>;
+
+  getCategory(request: Empty): Observable<GetCategoryResponse>;
+
   getCategorySub(request: Empty): Observable<GetCategorySubResponse>;
+
+  getRecordType(request: Empty): Observable<GetRecordTypeResponse>;
 
   toggleLike(request: ToggleLikeRequest): Observable<ToggleLikeResponse>;
 
@@ -239,8 +301,6 @@ export interface FDistServiceClient {
 }
 
 export interface FDistServiceController {
-  getCategory(request: Empty): Promise<GetCategoryResponse> | Observable<GetCategoryResponse> | GetCategoryResponse;
-
   getContent(
     request: GetContentRequest,
   ): Promise<GetContentResponse> | Observable<GetContentResponse> | GetContentResponse;
@@ -265,9 +325,19 @@ export interface FDistServiceController {
     request: GetVideoCategoryRequest,
   ): Promise<GetVideoCategoryResponse> | Observable<GetVideoCategoryResponse> | GetVideoCategoryResponse;
 
+  getVideoRecordType(
+    request: GetVideoRecordTypeRequest,
+  ): Promise<GetVideoRecordTypeResponse> | Observable<GetVideoRecordTypeResponse> | GetVideoRecordTypeResponse;
+
+  getCategory(request: Empty): Promise<GetCategoryResponse> | Observable<GetCategoryResponse> | GetCategoryResponse;
+
   getCategorySub(
     request: Empty,
   ): Promise<GetCategorySubResponse> | Observable<GetCategorySubResponse> | GetCategorySubResponse;
+
+  getRecordType(
+    request: Empty,
+  ): Promise<GetRecordTypeResponse> | Observable<GetRecordTypeResponse> | GetRecordTypeResponse;
 
   toggleLike(
     request: ToggleLikeRequest,
@@ -281,7 +351,6 @@ export interface FDistServiceController {
 export function FDistServiceControllerMethods() {
   return function (constructor: Function) {
     const grpcMethods: string[] = [
-      "getCategory",
       "getContent",
       "videoRecording",
       "getNodeId",
@@ -289,7 +358,10 @@ export function FDistServiceControllerMethods() {
       "getVideos",
       "getVideoById",
       "getVideoCategory",
+      "getVideoRecordType",
+      "getCategory",
       "getCategorySub",
+      "getRecordType",
       "toggleLike",
       "reportVideo",
     ];

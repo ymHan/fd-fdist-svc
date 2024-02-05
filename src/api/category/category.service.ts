@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Video } from '@entities/index';
-import { GetCategorySubResponse, GetCategoryResponse } from '@proto/fdist.pb';
+import { GetCategorySubResponse, GetCategoryResponse, GetRecordTypeResponse } from '@proto/fdist.pb';
 
 @Injectable()
 export class CategoryService {
@@ -45,6 +45,24 @@ export class CategoryService {
     });
 
     data.sort((a, b) => a.index - b.index);
+
+    return {
+      result: 'ok',
+      status: 200,
+      message: 'success',
+      data,
+    };
+  }
+  public async getRecordType(): Promise<GetRecordTypeResponse> {
+    const recordTypes = await this.videoRepository.createQueryBuilder('video').select('DISTINCT "recordType"').getRawMany();
+    let num = 0;
+    const data = recordTypes.map((item) => {
+      console.log(item);
+      return {
+        index: num++,
+        recordType: item.recordType,
+      };
+    });
 
     return {
       result: 'ok',

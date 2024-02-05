@@ -3,7 +3,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Video } from '@entities/index';
 import { ReportEntity } from '@entities/report.entity';
-import { GetVideoByIdRequest, GetVideoListRequest, ReportVideoRequest, ReportVideoResponse } from '@proto/fdist.pb';
+import {
+  GetVideoByIdRequest,
+  GetVideoListRequest,
+  ReportVideoRequest,
+  ReportVideoResponse,
+  GetVideoRecordTypeRequest,
+  GetVideoRecordTypeResponse,
+} from '@proto/fdist.pb';
 import { Category } from '@enum/index';
 
 @Injectable()
@@ -14,7 +21,47 @@ export class VideoService {
   @InjectRepository(ReportEntity)
   private readonly reportRepository: Repository<ReportEntity>;
 
-  //constructor(private readonly videoRepository: VideoRepository) {}
+  public async getVideoRecordType(payload: GetVideoRecordTypeRequest): Promise<any> {
+    const type = payload.type;
+    const page = payload.page || 1;
+    const limit = payload.limit || 10;
+
+    if (!type) {
+      const queryBuilder = this.videoRepository.createQueryBuilder('video');
+      const [videos, total] = await queryBuilder.where('video.recordType = :type', { type }).getManyAndCount();
+
+      return {
+        result: 'ok',
+        status: 200,
+        message: 'success',
+        data: videos,
+        meta: {
+          total,
+          page,
+          lastPage: Math.ceil(total / limit),
+        },
+      };
+    } else {
+      const queryBuilder = this.videoRepository.createQueryBuilder('video');
+      const [videos, total] = await queryBuilder
+        .where('video.recordType = :type', { type })
+        .skip((page - 1) * limit)
+        .take(limit)
+        .getManyAndCount();
+
+      return {
+        result: 'ok',
+        status: 200,
+        message: 'success',
+        data: videos,
+        meta: {
+          total,
+          page,
+          lastPage: Math.ceil(total / limit),
+        },
+      };
+    }
+  }
 
   public async getVideos(payload: GetVideoListRequest): Promise<any> {
     const cat = payload.cat || 'all';
@@ -24,13 +71,8 @@ export class VideoService {
     if (cat === 'all' || cat === 'ALL' || cat === '' || cat === undefined || cat === null) {
       //const [videos, total] = await this.videoRepository.findAndCount();
       const queryBuilder = this.videoRepository.createQueryBuilder('video');
-      const [videos, total] = await queryBuilder
-        //.where('video.category = :cat', { cat })
-        .skip((page - 1) * limit)
-        .take(limit)
-        .getManyAndCount();
+      const [videos, total] = await queryBuilder.getManyAndCount();
 
-      console.log(Math.ceil(total / limit));
       return {
         result: 'ok',
         status: 200,
@@ -39,7 +81,7 @@ export class VideoService {
         meta: {
           total,
           page,
-          last_page: Math.ceil(total / limit),
+          lastPage: Math.ceil(total / limit),
         },
       };
     } else {
@@ -59,7 +101,7 @@ export class VideoService {
           meta: {
             total,
             page,
-            last_page: Math.ceil(total / limit),
+            lastPage: Math.ceil(total / limit),
           },
         };
       } else {
@@ -78,7 +120,7 @@ export class VideoService {
           meta: {
             total,
             page,
-            last_page: Math.ceil(total / limit),
+            lastPage: Math.ceil(total / limit),
           },
         };
       }
@@ -129,5 +171,4 @@ export class VideoService {
       ],
     };
   }
-
 }

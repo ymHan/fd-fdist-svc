@@ -2,7 +2,12 @@ import { Controller, Inject } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
 
 import { VideoService } from './video.service';
-import { F_DIST_SERVICE_NAME, GetVideoByIdRequest, GetVideoListRequest } from '@proto/fdist.pb';
+import {
+  F_DIST_SERVICE_NAME,
+  GetVideoByIdRequest,
+  GetVideoListRequest,
+  GetVideoRecordTypeRequest, GetVideoRecordTypeResponse,
+} from '@proto/fdist.pb';
 
 @Controller()
 export class VideoController {
@@ -22,5 +27,10 @@ export class VideoController {
   @GrpcMethod(F_DIST_SERVICE_NAME, 'reportVideo')
   private reportVideo(payload: any): Promise<any> {
     return this.service.reportVideo(payload);
+  }
+
+  @GrpcMethod(F_DIST_SERVICE_NAME, 'getVideoRecordType')
+  private getVideoRecordType(payload: any): Promise<any> {
+    return this.service.getVideoRecordType(payload);
   }
 }
