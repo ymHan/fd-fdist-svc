@@ -11,7 +11,7 @@ import {
   GetVideoRecordTypeRequest,
   GetVideoRecordTypeResponse,
 } from '@proto/fdist.pb';
-import { Category } from '@enum/index';
+import { Category, CategorySubEnum, RecordType } from '@enum/index';
 
 @Injectable()
 export class VideoService {
@@ -68,7 +68,31 @@ export class VideoService {
     const page = payload.page || 1;
     const limit = payload.limit || 10;
 
-    if (cat === 'all' || cat === 'ALL' || cat === '' || cat === undefined || cat === null) {
+    let checkMain = false;
+    let checkSub = false;
+    let checkRecordType = false;
+
+    const keys = Object.keys(CategorySubEnum);
+    const keys2 = Object.keys(Category);
+    const keys3 = Object.keys(RecordType);
+
+    keys.forEach((key) => {
+      if (cat === key) {
+        checkSub = true
+      }
+    })
+    keys2.forEach((key) => {
+      if (cat === key) {
+        checkMain = true
+      }
+    });
+    keys3.forEach((key) => {
+      if (cat === key) {
+        checkRecordType = true
+      }
+    });
+
+    if (!checkMain && !checkSub) {
       //const [videos, total] = await this.videoRepository.findAndCount();
       const queryBuilder = this.videoRepository.createQueryBuilder('video');
       const [videos, total] = await queryBuilder.getManyAndCount();
@@ -84,46 +108,69 @@ export class VideoService {
           lastPage: Math.ceil(total / limit),
         },
       };
-    } else {
-      if (Category.ENTERTAINMENTS === cat || Category.SPORTS === cat || Category.PROMOTION === cat) {
-        const queryBuilder = this.videoRepository.createQueryBuilder('video');
-        const [videos, total] = await queryBuilder
-          .where('video.category = :cat', { cat })
-          .skip((page - 1) * limit)
-          .take(limit)
-          .getManyAndCount();
+    }
 
-        return {
-          result: 'ok',
-          status: 200,
-          message: 'success',
-          data: videos,
-          meta: {
-            total,
-            page,
-            lastPage: Math.ceil(total / limit),
-          },
-        };
-      } else {
-        const queryBuilder = this.videoRepository.createQueryBuilder('video');
-        const [videos, total] = await queryBuilder
-          .where('video.categorySub = :cat', { cat })
-          .skip((page - 1) * limit)
-          .take(limit)
-          .getManyAndCount();
+    if (checkMain) {
+      const queryBuilder = this.videoRepository.createQueryBuilder('video');
+      const [videos, total] = await queryBuilder
+        .where('video.category = :cat', { cat })
+        .skip((page - 1) * limit)
+        .take(limit)
+        .getManyAndCount();
 
-        return {
-          result: 'ok',
-          status: 200,
-          message: 'success',
-          data: videos,
-          meta: {
-            total,
-            page,
-            lastPage: Math.ceil(total / limit),
-          },
-        };
-      }
+      return {
+        result: 'ok',
+        status: 200,
+        message: 'success',
+        data: videos,
+        meta: {
+          total,
+          page,
+          lastPage: Math.ceil(total / limit),
+        },
+      };
+    }
+
+    if (checkSub) {
+      const queryBuilder = this.videoRepository.createQueryBuilder('video');
+      const [videos, total] = await queryBuilder
+        .where('video.categorySub = :cat', { cat })
+        .skip((page - 1) * limit)
+        .take(limit)
+        .getManyAndCount();
+
+      return {
+        result: 'ok',
+        status: 200,
+        message: 'success',
+        data: videos,
+        meta: {
+          total,
+          page,
+          lastPage: Math.ceil(total / limit),
+        },
+      };
+    }
+
+    if (checkRecordType) {
+      const queryBuilder = this.videoRepository.createQueryBuilder('video');
+      const [videos, total] = await queryBuilder
+        .where('video.recordType = :cat', { cat })
+        .skip((page - 1) * limit)
+        .take(limit)
+        .getManyAndCount();
+
+      return {
+        result: 'ok',
+        status: 200,
+        message: 'success',
+        data: videos,
+        meta: {
+          total,
+          page,
+          lastPage: Math.ceil(total / limit),
+        },
+      };
     }
   }
   async getVideoById(payload: GetVideoByIdRequest): Promise<any> {
