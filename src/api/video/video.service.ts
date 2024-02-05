@@ -9,7 +9,6 @@ import {
   ReportVideoRequest,
   ReportVideoResponse,
   GetVideoRecordTypeRequest,
-  GetVideoRecordTypeResponse,
 } from '@proto/fdist.pb';
 import { Category, CategorySubEnum, RecordType } from '@enum/index';
 
@@ -77,21 +76,18 @@ export class VideoService {
     const keys3 = Object.keys(RecordType);
 
     keys.forEach((key) => {
-      console.log(key);
       if (cat === key) {
-        checkSub = true
+        checkSub = true;
       }
-    })
+    });
     keys2.forEach((key) => {
-      console.log(key);
       if (cat === key) {
-        checkMain = true
+        checkMain = true;
       }
     });
     keys3.forEach((key) => {
-      console.log(key);
       if (cat === key) {
-        checkRecordType = true
+        checkRecordType = true;
       }
     });
 
