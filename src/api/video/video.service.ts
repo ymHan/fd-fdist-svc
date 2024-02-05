@@ -77,22 +77,25 @@ export class VideoService {
     const keys3 = Object.keys(RecordType);
 
     keys.forEach((key) => {
+      console.log(key);
       if (cat === key) {
         checkSub = true
       }
     })
     keys2.forEach((key) => {
+      console.log(key);
       if (cat === key) {
         checkMain = true
       }
     });
     keys3.forEach((key) => {
+      console.log(key);
       if (cat === key) {
         checkRecordType = true
       }
     });
 
-    if (!checkMain && !checkSub) {
+    if (!checkMain && !checkSub && !checkRecordType) {
       //const [videos, total] = await this.videoRepository.findAndCount();
       const queryBuilder = this.videoRepository.createQueryBuilder('video');
       const [videos, total] = await queryBuilder.getManyAndCount();
