@@ -57,7 +57,6 @@ export class CategoryService {
     const recordTypes = await this.videoRepository.createQueryBuilder('video').select('DISTINCT "recordType"').getRawMany();
     let num = 0;
     const data = recordTypes.map((item) => {
-      console.log(item);
       return {
         index: num++,
         recordType: item.recordType,
