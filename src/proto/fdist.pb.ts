@@ -5,6 +5,22 @@ import { Empty } from "./google/protobuf/empty.pb";
 
 export const protobufPackage = "fdist";
 
+export interface GetVideoCategoryRequest {
+  caty: string;
+}
+
+export interface GetVideoCategoryResponse {
+  result: string;
+  status: number;
+  message: string;
+  data: GetVideoCategoryResponse_DATA[];
+}
+
+export interface GetVideoCategoryResponse_DATA {
+  index: number;
+  category: string;
+}
+
 export interface ReportVideoRequest {
   userId: number;
   videoId: number;
@@ -174,7 +190,15 @@ export interface Category {
 }
 
 export interface GetCategoryResponse {
-  category: Category[];
+  result: string;
+  status: number;
+  message: string;
+  data: GetCategoryResponse_DATA[];
+}
+
+export interface GetCategoryResponse_DATA {
+  index: number;
+  category: string;
 }
 
 export interface ContentItem {
@@ -204,6 +228,8 @@ export interface FDistServiceClient {
   getVideos(request: GetVideoListRequest): Observable<GetVideoListResponse>;
 
   getVideoById(request: GetVideoByIdRequest): Observable<GetVideoByIdResponse>;
+
+  getVideoCategory(request: GetVideoCategoryRequest): Observable<GetVideoCategoryResponse>;
 
   getCategorySub(request: Empty): Observable<GetCategorySubResponse>;
 
@@ -235,6 +261,10 @@ export interface FDistServiceController {
     request: GetVideoByIdRequest,
   ): Promise<GetVideoByIdResponse> | Observable<GetVideoByIdResponse> | GetVideoByIdResponse;
 
+  getVideoCategory(
+    request: GetVideoCategoryRequest,
+  ): Promise<GetVideoCategoryResponse> | Observable<GetVideoCategoryResponse> | GetVideoCategoryResponse;
+
   getCategorySub(
     request: Empty,
   ): Promise<GetCategorySubResponse> | Observable<GetCategorySubResponse> | GetCategorySubResponse;
@@ -258,6 +288,7 @@ export function FDistServiceControllerMethods() {
       "initialize",
       "getVideos",
       "getVideoById",
+      "getVideoCategory",
       "getCategorySub",
       "toggleLike",
       "reportVideo",
