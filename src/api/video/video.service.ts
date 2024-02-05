@@ -85,7 +85,7 @@ export class VideoService {
         },
       };
     } else {
-      if (Category.ENTERTAINMENTS === 'ENTERTAINMENTS' || Category.SPORTS === 'SPORTS' || Category.PROMOTION === 'PROMOTION') {
+      if (Category.ENTERTAINMENTS === cat || Category.SPORTS === cat || Category.PROMOTION === cat) {
         const queryBuilder = this.videoRepository.createQueryBuilder('video');
         const [videos, total] = await queryBuilder
           .where('video.category = :cat', { cat })
