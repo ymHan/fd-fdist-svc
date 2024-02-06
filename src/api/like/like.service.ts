@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Like } from '@entities/index';
 import { Video } from '@entities/index';
-import { ToggleLikeRequest, ToggleLikeResponse } from '@proto/fdist.pb';
+import { GetLikeCheckRequest, GetLikeCheckResponse, ToggleLikeRequest, ToggleLikeResponse } from '@proto/fdist.pb';
 
 @Injectable()
 export class LikeService {
@@ -11,6 +11,33 @@ export class LikeService {
   private readonly likeRepository: Repository<Like>;
   @InjectRepository(Video)
   private readonly videoRepository: Repository<Video>;
+
+  public async getLikeCheck(payload: GetLikeCheckRequest): Promise<GetLikeCheckResponse> {
+    const tmpLike = await this.likeRepository.findOne({ where: { userId: payload.userId, videoId: payload.videoId } });
+    if (tmpLike) {
+      return {
+        result: 'ok',
+        status: 200,
+        message: 'success',
+        data: [
+          {
+            result: true,
+          },
+        ],
+      };
+    } else {
+      return {
+        result: 'ok',
+        status: 200,
+        message: 'success',
+        data: [
+          {
+            result: false,
+          },
+        ],
+      };
+    }
+  }
 
   public async toggleLike(payload: ToggleLikeRequest): Promise<ToggleLikeResponse> {
     const tmpLike = await this.likeRepository.findOne({ where: { userId: payload.userId, videoId: payload.videoId } });
@@ -31,6 +58,7 @@ export class LikeService {
         data: [
           {
             result: false,
+            likeCount: video.likesCount
           },
         ],
       };
@@ -50,6 +78,7 @@ export class LikeService {
         data: [
           {
             result: true,
+            likeCount: video.likesCount,
           },
         ],
       };

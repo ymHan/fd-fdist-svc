@@ -2,7 +2,7 @@ import { IsEmail } from 'class-validator';
 import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, Unique, OneToOne, OneToMany, JoinColumn } from 'typeorm';
 import { AccountRoles, AccountStates } from '@enum/index';
 import { Video } from './video.entity';
-import { Profile } from './user-profile.entity';
+import { Profile } from './user-profile.account.entity';
 
 @Entity({ name: 'user' })
 @Unique(['email'])
@@ -49,6 +49,6 @@ export class User extends BaseEntity {
   videos: Video;
 
   @OneToOne(() => Profile)
-  @JoinColumn({ name: 'profile_id' })
+  @JoinColumn()
   profile: Profile;
 }

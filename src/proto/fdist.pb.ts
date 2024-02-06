@@ -5,6 +5,22 @@ import { Empty } from "./google/protobuf/empty.pb";
 
 export const protobufPackage = "fdist";
 
+export interface GetLikeCheckResponse {
+  result: string;
+  status: number;
+  message: string;
+  data: GetLikeCheckResponse_DATA[];
+}
+
+export interface GetLikeCheckResponse_DATA {
+  result: boolean;
+}
+
+export interface GetLikeCheckRequest {
+  userId: number;
+  videoId: number;
+}
+
 export interface GetVideoRecordTypeRequest {
   type: string;
   page: number;
@@ -113,6 +129,7 @@ export interface ToggleLikeResponse {
 
 export interface ToggleLikeResponse_DATA {
   result?: boolean | undefined;
+  likeCount?: number | undefined;
   error?: string | undefined;
 }
 
@@ -297,6 +314,8 @@ export interface FDistServiceClient {
 
   toggleLike(request: ToggleLikeRequest): Observable<ToggleLikeResponse>;
 
+  getLikeCheck(request: GetLikeCheckRequest): Observable<GetLikeCheckResponse>;
+
   reportVideo(request: ReportVideoRequest): Observable<ReportVideoResponse>;
 }
 
@@ -343,6 +362,10 @@ export interface FDistServiceController {
     request: ToggleLikeRequest,
   ): Promise<ToggleLikeResponse> | Observable<ToggleLikeResponse> | ToggleLikeResponse;
 
+  getLikeCheck(
+    request: GetLikeCheckRequest,
+  ): Promise<GetLikeCheckResponse> | Observable<GetLikeCheckResponse> | GetLikeCheckResponse;
+
   reportVideo(
     request: ReportVideoRequest,
   ): Promise<ReportVideoResponse> | Observable<ReportVideoResponse> | ReportVideoResponse;
@@ -363,6 +386,7 @@ export function FDistServiceControllerMethods() {
       "getCategorySub",
       "getRecordType",
       "toggleLike",
+      "getLikeCheck",
       "reportVideo",
     ];
     for (const method of grpcMethods) {
