@@ -3,12 +3,11 @@ import {
   Column,
   BaseEntity,
   PrimaryGeneratedColumn,
-  OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
 } from 'typeorm';
-import { User } from './user.account.entity';
+//import { User } from './user.account.entity';
 import {
   Category,
   CategorySubCodeEnum,
@@ -89,7 +88,4 @@ export class Video extends BaseEntity {
 
   @DeleteDateColumn({ name: 'deleted_at', comment: '삭제일' })
   deletedAt?: Date | null;
-
-  @OneToMany(() => User, (user) => user.email)
-  userEmail: User[];
 }
