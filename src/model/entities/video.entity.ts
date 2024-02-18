@@ -8,12 +8,7 @@ import {
   DeleteDateColumn,
 } from 'typeorm';
 //import { User } from './user.account.entity';
-import {
-  Category,
-  CategorySubCodeEnum,
-  CategorySubEnum,
-  RecordType,
-} from '@enum/index';
+import { Category, CategorySubCodeEnum, CategorySubEnum, RecordType } from '@enum/index';
 
 @Entity()
 export class Video extends BaseEntity {
@@ -42,10 +37,10 @@ export class Video extends BaseEntity {
   ownerChannelName: string;
 
   @Column()
-  ownerProfileIconUrl? : string | null;
+  ownerProfileIconUrl?: string | null;
 
   @Column()
-  thumbnailUrl? : string | null;
+  thumbnailUrl?: string | null;
 
   @Column({ default: 0 })
   viewCount: number; // 조회수
@@ -71,21 +66,21 @@ export class Video extends BaseEntity {
   @Column({ type: 'enum', name: 'recordType', enum: RecordType })
   recordType: string;
 
-  @Column("text", { array: true })
+  @Column('text', { array: true })
   contentUrlList: string[];
 
-  @Column("text", { array: true })
+  @Column('text', { array: true })
   poseIndicatorList?: string[] | null;
 
   @Column()
   nodeId: string;
 
-  @CreateDateColumn({ name: 'created_at', comment: '생성일' })
+  @CreateDateColumn({ name: 'createdAt', comment: '생성일' })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updated_at', comment: '수정일' })
+  @UpdateDateColumn({ name: 'updatedAt', comment: '수정일' })
   updatedAt: Date;
 
-  @DeleteDateColumn({ name: 'deleted_at', comment: '삭제일' })
+  @DeleteDateColumn({ name: 'deletedAt', comment: '삭제일' })
   deletedAt?: Date | null;
 }
