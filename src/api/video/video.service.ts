@@ -27,7 +27,10 @@ export class VideoService {
 
     if (!type) {
       const queryBuilder = this.videoRepository.createQueryBuilder('video');
-      const [videos, total] = await queryBuilder.where('video.recordType = :type', { type }).getManyAndCount();
+      const [videos, total] = await queryBuilder
+        .where('video.recordType = :type', { type })
+        .andWhere('video.isPublished = :isPublished', { isPublished: true })
+        .getManyAndCount();
 
       return {
         result: 'ok',
@@ -44,6 +47,7 @@ export class VideoService {
       const queryBuilder = this.videoRepository.createQueryBuilder('video');
       const [videos, total] = await queryBuilder
         .where('video.recordType = :type', { type })
+        .andWhere('video.isPublished = :isPublished', { isPublished: true })
         .skip((page - 1) * limit)
         .take(limit)
         .getManyAndCount();
@@ -94,7 +98,9 @@ export class VideoService {
     if (!checkMain && !checkSub && !checkRecordType) {
       //const [videos, total] = await this.videoRepository.findAndCount();
       const queryBuilder = this.videoRepository.createQueryBuilder('video');
-      const [videos, total] = await queryBuilder.getManyAndCount();
+      const [videos, total] = await queryBuilder
+        .where('video.isPublished = :isPublished', { isPublished: true })
+        .getManyAndCount();
 
       return {
         result: 'ok',
@@ -113,6 +119,7 @@ export class VideoService {
       const queryBuilder = this.videoRepository.createQueryBuilder('video');
       const [videos, total] = await queryBuilder
         .where('video.category = :cat', { cat })
+        .andWhere('video.isPublished = :isPublished', { isPublished: true })
         .skip((page - 1) * limit)
         .take(limit)
         .getManyAndCount();
@@ -134,6 +141,7 @@ export class VideoService {
       const queryBuilder = this.videoRepository.createQueryBuilder('video');
       const [videos, total] = await queryBuilder
         .where('video.categorySub = :cat', { cat })
+        .andWhere('video.isPublished = :isPublished', { isPublished: true })
         .skip((page - 1) * limit)
         .take(limit)
         .getManyAndCount();
@@ -155,6 +163,7 @@ export class VideoService {
       const queryBuilder = this.videoRepository.createQueryBuilder('video');
       const [videos, total] = await queryBuilder
         .where('video.recordType = :cat', { cat })
+        .andWhere('video.isPublished = :isPublished', { isPublished: true })
         .skip((page - 1) * limit)
         .take(limit)
         .getManyAndCount();

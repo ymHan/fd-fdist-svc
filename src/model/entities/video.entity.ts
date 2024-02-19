@@ -75,6 +75,12 @@ export class Video extends BaseEntity {
   @Column()
   nodeId: string;
 
+  @Column({ default: false, nullable: false })
+  isPublished: boolean;
+
+  @Column({ default: false, nullable: false })
+  isDeleted: boolean;
+
   @CreateDateColumn({ name: 'createdAt', comment: '생성일' })
   createdAt: Date;
 
