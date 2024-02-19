@@ -34,7 +34,6 @@ lerna-debug.log*
 !.vscode/launch.json
 !.vscode/extensions.json
 
-/src/proto/
-/src/mwc/
-/src/mwc/20240215/
-/src/mwc/
+/src/proto
+/src/mwc
+/src/mwc/20240215

@@ -6,7 +6,6 @@ import {
   F_DIST_SERVICE_NAME,
   GetVideoByIdRequest,
   GetVideoListRequest,
-  GetVideoRecordTypeRequest, GetVideoRecordTypeResponse,
 } from '@proto/fdist.pb';
 
 @Controller()
@@ -32,5 +31,15 @@ export class VideoController {
   @GrpcMethod(F_DIST_SERVICE_NAME, 'getVideoRecordType')
   private getVideoRecordType(payload: any): Promise<any> {
     return this.service.getVideoRecordType(payload);
+  }
+
+  @GrpcMethod(F_DIST_SERVICE_NAME, 'myVideoList')
+  private myVideoList(payload: any): Promise<any> {
+    return this.service.myVideoList(payload);
+  }
+
+  @GrpcMethod(F_DIST_SERVICE_NAME, 'myVideoExists')
+  private myVideoExists(payload: any): Promise<any> {
+    return this.service.myVideoExists(payload);
   }
 }

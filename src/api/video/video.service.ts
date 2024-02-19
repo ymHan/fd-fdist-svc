@@ -9,6 +9,9 @@ import {
   ReportVideoRequest,
   ReportVideoResponse,
   GetVideoRecordTypeRequest,
+  MyVideoListRequest,
+  MyVideoExistsRequest,
+  MyVideoExistsResponse,
 } from '@proto/fdist.pb';
 import { Category, CategorySubEnum, RecordType } from '@enum/index';
 
@@ -19,6 +22,54 @@ export class VideoService {
 
   @InjectRepository(ReportEntity)
   private readonly reportRepository: Repository<ReportEntity>;
+
+  public async myVideoExists(payload: MyVideoExistsRequest): Promise<MyVideoExistsResponse> {
+    const userEmail = payload.userEmail;
+
+    const video = await this.videoRepository.findOne({ where: { email: userEmail } });
+    if (!video) {
+      return {
+        result: 'fail',
+        status: 200,
+        message: 'My video not exists',
+      };
+    } else {
+      return {
+        result: 'ok',
+        status: 200,
+        message: 'My video file is exists',
+      };
+    }
+  }
+
+  public async myVideoList(payload: MyVideoListRequest): Promise<any> {
+    const userEmail = payload.userEmail;
+    const page = payload.page || 1;
+    const limit = payload.limit || 10;
+    const sort = payload.sort || 'createdAt';
+    const order = payload.order || 'desc';
+
+    const queryBuilder = this.videoRepository.createQueryBuilder('video');
+    const [videos, total] = await queryBuilder
+      .where('video.email = :userEmail', { userEmail })
+      .skip((page - 1) * limit)
+      .orderBy(`video.${sort}`, order.toUpperCase() as 'ASC' | 'DESC')
+      .take(limit)
+      .getManyAndCount();
+
+    return {
+      result: 'ok',
+      status: 200,
+      message: 'success',
+      data: videos,
+      meta: {
+        page,
+        limit,
+        totalCount: total,
+        lastPage: Math.ceil(total / limit),
+      },
+    };
+  }
 
   public async getVideoRecordType(payload: GetVideoRecordTypeRequest): Promise<any> {
     const type = payload.type;
