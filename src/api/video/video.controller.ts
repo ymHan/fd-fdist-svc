@@ -6,7 +6,6 @@ import {
   F_DIST_SERVICE_NAME,
   GetVideoByIdRequest,
   GetVideoListRequest,
-  GetVideoRecordTypeRequest, GetVideoRecordTypeResponse,
 } from '@proto/fdist.pb';
 
 @Controller()
