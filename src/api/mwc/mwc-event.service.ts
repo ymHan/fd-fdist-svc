@@ -11,6 +11,8 @@ import { mkdirp } from 'mkdirp';
 import * as dotenv from 'dotenv';
 
 import FfmpegCommand from 'fluent-ffmpeg';
+FfmpegCommand.setFfprobePath('/usr/bin/ffprobe');
+FfmpegCommand.setFfmpegPath('/usr/bin/ffmpeg');
 
 dotenv.config();
 
@@ -180,7 +182,7 @@ export class MwcEventService {
 
   private async getDuration(fileName: string): Promise<number> {
     return new Promise((resolve, reject) => {
-      FfmpegCommand.ffprobe(`${process.env.MWC_FILE_PATH}/mwc/${this.getDates()}/video/${fileName}`, (err, metadata) => {
+      FfmpegCommand.ffprobe(`${process.env.MWC_FILE_PATH}/${this.getDates()}/${fileName}`, (err, metadata) => {
         if (err) {
           reject(err);
         }
