@@ -2,15 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { Category, CategorySubEnum, RecordType } from '@enum/index';
+import { Category, CategorySubEnum, RecordType, CategorySubCodeEnum } from '@enum/index';
 import { User, Video } from '@entities/index';
 import { AddMwcRequest, TogglePublishedRequest, UpdateVideoMetaInfoRequest, DeleteVideoRequest } from '@proto/fdist.pb';
 import * as fs from 'fs';
 import * as fsp from 'fs/promises';
-import { mkdirp } from 'mkdirp';
 import * as dotenv from 'dotenv';
 
-import FfmpegCommand from 'fluent-ffmpeg';
+import * as FfmpegCommand from 'fluent-ffmpeg';
 FfmpegCommand.setFfprobePath('/usr/bin/ffprobe');
 FfmpegCommand.setFfmpegPath('/usr/bin/ffmpeg');
 
@@ -134,8 +133,12 @@ export class MwcEventService {
         data: null,
       };
     }
-    console.log(file);
-    console.log(fileName)
+
+    const existsDir = fs.existsSync(`${process.env.MWC_FILE_ROOT}/${userId}`);
+    if (!existsDir) {
+      await fsp.mkdir(`${process.env.MWC_FILE_ROOT}/${userId}`);
+    }
+
     const duration: number = await this.getDuration(fileName);
     const video = new Video();
 
@@ -146,17 +149,17 @@ export class MwcEventService {
     video.ownerName = user.name;
     video.ownerNickName = user.nickname;
     video.ownerChannelName = user.nickname;
-    video.ownerProfileIconUrl = null;
+    video.ownerProfileIconUrl = '';
     video.thumbnailUrl = `http://cdn.4dist.com/${user.email}/${fileName.split('.')[0]}.png`;
     video.duration = (duration * 1000).toString() || '0';
     video.category = Category.ENTERTAINMENTS;
     video.categorySub = CategorySubEnum.MWC;
-    video.categorySubCode = CategorySubEnum.MWC;
+    video.categorySubCode = CategorySubCodeEnum.MWC;
     video.recordType = RecordType.SHORTS;
     video.contentUrlList = [`http://cdn.4dist.com/${user.email}/${fileName}`];
     video.poseIndicatorList = [];
     video.nodeId = 'MWC0001001001';
-    console.log(video);
+
     const returnData = await this.videoRepository.save(video);
     await this.moveFile(fileName, user.email);
 
@@ -193,14 +196,14 @@ export class MwcEventService {
 
   private async moveFile(fileName: string, userEmail: string) {
     const file = fileName.split('.')[0];
-    await mkdirp(`${process.env.MWC_FILE_PATH}/${userEmail}`);
+
     await fsp.rename(
-      `${process.env.MWC_FILE_PATH}/mwc/${this.getDates()}/${fileName}`,
-      `${process.env.MWC_FILE_PATH}/${userEmail}/${fileName}`,
+      `${process.env.MWC_FILE_PATH}/${this.getDates()}/${fileName}`,
+      `${process.env.MWC_FILE_ROOT}/${userEmail}/${fileName}`,
     );
     await fsp.rename(
-      `${process.env.MWC_FILE_PATH}/mwc/${this.getDates()}/${file}.png`,
-      `${process.env.MWC_FILE_PATH}/${userEmail}/${file}.png`,
+      `${process.env.MWC_FILE_PATH}/${this.getDates()}/${file}.jpg`,
+      `${process.env.MWC_FILE_ROOT}/${userEmail}/${file}.jpg`,
     );
   }
 }
