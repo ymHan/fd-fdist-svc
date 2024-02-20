@@ -114,7 +114,7 @@ export class MwcEventService {
   public async addMwc(payload: AddMwcRequest): Promise<any> {
     const { userId, fileName } = payload;
     const user = await this.userRepository.findOne({ where: { email: userId } });
-    const file = await fs.readFile(`${process.env.MWC_FILE_PATH}/mwc/${this.getDates()}/video/${fileName}`);
+    const file = await fs.readFile(`${process.env.MWC_FILE_PATH}/${this.getDates()}/${fileName}`);
     if (!user) {
       return {
         result: 'fail',
@@ -143,13 +143,13 @@ export class MwcEventService {
     video.ownerNickName = user.nickname;
     video.ownerChannelName = user.nickname;
     video.ownerProfileIconUrl = null;
-    video.thumbnailUrl = `/${user.email}/${this.getDates()}/video/${fileName.split('.')[0]}.jpg`;
+    video.thumbnailUrl = `http://cdn.4dist.com/${user.email}/${fileName.split('.')[0]}.png`;
     video.duration = (duration * 1000).toString() || '0';
     video.category = Category.ENTERTAINMENTS;
     video.categorySub = CategorySubEnum.MWC;
     video.categorySubCode = CategorySubEnum.MWC;
     video.recordType = RecordType.SHORTS;
-    video.contentUrlList = [`/${user.email}/${this.getDates()}/video/${fileName}`];
+    video.contentUrlList = [`http://cdn.4dist.com/${user.email}/${fileName}`];
     video.poseIndicatorList = [];
     video.nodeId = 'MWC0001001001';
 
