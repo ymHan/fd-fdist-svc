@@ -5,7 +5,8 @@ import { Repository } from 'typeorm';
 import { Category, CategorySubEnum, RecordType } from '@enum/index';
 import { User, Video } from '@entities/index';
 import { AddMwcRequest, TogglePublishedRequest, UpdateVideoMetaInfoRequest, DeleteVideoRequest } from '@proto/fdist.pb';
-import * as fs from 'fs/promises';
+import * as fs from 'fs';
+import * as fsp from 'fs/promises';
 import { mkdirp } from 'mkdirp';
 import * as dotenv from 'dotenv';
 
@@ -114,7 +115,7 @@ export class MwcEventService {
   public async addMwc(payload: AddMwcRequest): Promise<any> {
     const { userId, fileName } = payload;
     const user = await this.userRepository.findOne({ where: { email: userId } });
-    const file = await fs.readFile(`${process.env.MWC_FILE_PATH}/${this.getDates()}/${fileName}`);
+    const file = fs.existsSync(`${process.env.MWC_FILE_PATH}/${this.getDates()}/${fileName}`);
     if (!user) {
       return {
         result: 'fail',
@@ -152,7 +153,7 @@ export class MwcEventService {
     video.contentUrlList = [`http://cdn.4dist.com/${user.email}/${fileName}`];
     video.poseIndicatorList = [];
     video.nodeId = 'MWC0001001001';
-
+    console.log(video);
     const returnData = await this.videoRepository.save(video);
     await this.moveFile(fileName, user.email);
 
@@ -189,14 +190,14 @@ export class MwcEventService {
 
   private async moveFile(fileName: string, userEmail: string) {
     const file = fileName.split('.')[0];
-    await mkdirp(`${process.env.MWC_FILE_PATH}/${userEmail}/${this.getDates()}/video`);
-    await fs.rename(
+    await mkdirp(`${process.env.MWC_FILE_PATH}/${userEmail}`);
+    await fsp.rename(
       `${process.env.MWC_FILE_PATH}/mwc/${this.getDates()}/${fileName}`,
-      `${process.env.MWC_FILE_PATH}/${userEmail}/${this.getDates()}/video/${fileName}`,
+      `${process.env.MWC_FILE_PATH}/${userEmail}/${fileName}`,
     );
-    await fs.rename(
-      `${process.env.MWC_FILE_PATH}/mwc/${this.getDates()}/${file}.jpg`,
-      `${process.env.MWC_FILE_PATH}/${userEmail}/${this.getDates()}/video/${file}.jpg`,
+    await fsp.rename(
+      `${process.env.MWC_FILE_PATH}/mwc/${this.getDates()}/${file}.png`,
+      `${process.env.MWC_FILE_PATH}/${userEmail}/${file}.png`,
     );
   }
 }
