@@ -132,7 +132,8 @@ export class MwcEventService {
         data: null,
       };
     }
-
+    console.log(file);
+    console.log(fileName)
     const duration: number = await this.getDuration(fileName);
     const video = new Video();
 
