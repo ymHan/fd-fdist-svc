@@ -24,8 +24,8 @@ export class MwcEventController {
     return this.service.existMwc(payload);
   }
 
-  @GrpcMethod(MWC_SERVICE_NAME, 'UpdateMwcMetaInfo')
-  private UpdateMwcMetaInfo(payload: UpdateVideoMetaInfoRequest): Promise<UpdateVideoMetaInfoResponse> {
-    return this.service.UpdateMwcMetaInfo(payload);
+  @GrpcMethod(MWC_SERVICE_NAME, 'updateMwcMetaInfo')
+  private updateMwcMetaInfo(payload: UpdateVideoMetaInfoRequest): Promise<UpdateVideoMetaInfoResponse> {
+    return this.service.updateMwcMetaInfo(payload);
   }
 }

@@ -65,7 +65,7 @@ export class MwcEventService {
       data: result,
     };
   }
-  public async UpdateMwcMetaInfo(payload: UpdateVideoMetaInfoRequest): Promise<any> {
+  public async updateMwcMetaInfo(payload: UpdateVideoMetaInfoRequest): Promise<any> {
     const { userEmail, videoId, title, subTitle, description } = payload;
     const video = await this.videoRepository.findOne({ where: { email: userEmail, id: videoId } });
     if (!video) {
