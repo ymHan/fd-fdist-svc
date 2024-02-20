@@ -2,11 +2,7 @@ import { Controller, Inject } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
 
 import { VideoService } from './video.service';
-import {
-  F_DIST_SERVICE_NAME,
-  GetVideoByIdRequest,
-  GetVideoListRequest,
-} from '@proto/fdist.pb';
+import { F_DIST_SERVICE_NAME, GetVideoByIdRequest, GetVideoListRequest } from '@proto/fdist.pb';
 
 @Controller()
 export class VideoController {
