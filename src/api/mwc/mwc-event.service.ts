@@ -76,9 +76,10 @@ export class MwcEventService {
         data: null,
       };
     }
-    video.title = title;
-    video.subTitle = subTitle;
-    video.description = description;
+    video.title !== title ? (video.title = title) : null;
+    video.subTitle !== subTitle ? (video.subTitle = subTitle) : null;
+    video.description !== description ? (video.description = description) : null;
+
     const result = await this.videoRepository.save(video);
     return {
       result: 'ok',
