@@ -11,7 +11,10 @@ import {
   GetVideoRecordTypeRequest,
   MyVideoListRequest,
   MyVideoExistsRequest,
-  MyVideoExistsResponse, DeleteVideoRequest, TogglePublishedRequest,
+  MyVideoExistsResponse,
+  DeleteVideoRequest,
+  TogglePublishedRequest,
+  TogglePublishedResponse,
 } from '@proto/fdist.pb';
 import { Category, CategorySubEnum, RecordType } from '@enum/index';
 
@@ -23,7 +26,7 @@ export class VideoService {
   @InjectRepository(ReportEntity)
   private readonly reportRepository: Repository<ReportEntity>;
 
-  public async togglePublished(payload: TogglePublishedRequest): Promise<any> {
+  public async togglePublished(payload: TogglePublishedRequest): Promise<TogglePublishedResponse> {
     const { userId, videoId } = payload;
     const video = await this.videoRepository.findOne({ where: { email: userId, id: videoId } });
     if (!video) {
@@ -36,12 +39,13 @@ export class VideoService {
     }
     video.isPublished = !video.isPublished;
     const result = await this.videoRepository.save(video);
+
     return {
       result: 'ok',
       status: 200,
       message: 'success',
       data: {
-        isPublished: result.isPublished
+        isPublished: result.isPublished,
       },
     };
   }

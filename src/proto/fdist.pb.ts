@@ -15,6 +15,11 @@ export interface TogglePublishedResponse {
   result: string;
   status: number;
   message: string;
+  data: TogglePublishedResponse_DATA | undefined;
+}
+
+export interface TogglePublishedResponse_DATA {
+  isPublished: boolean;
 }
 
 export interface DeleteVideoRequest {

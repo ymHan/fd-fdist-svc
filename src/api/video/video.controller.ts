@@ -2,7 +2,13 @@ import { Controller, Inject } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
 
 import { VideoService } from './video.service';
-import { F_DIST_SERVICE_NAME, GetVideoByIdRequest, GetVideoListRequest, VIDEO_SERVICE_NAME } from '@proto/fdist.pb';
+import {
+  F_DIST_SERVICE_NAME,
+  GetVideoByIdRequest,
+  GetVideoListRequest, TogglePublishedRequest,
+  TogglePublishedResponse,
+  VIDEO_SERVICE_NAME,
+} from '@proto/fdist.pb';
 
 @Controller()
 export class VideoController {
@@ -45,7 +51,7 @@ export class VideoController {
   }
 
   @GrpcMethod(VIDEO_SERVICE_NAME, 'togglePublished')
-  private togglePublished(payload: any): Promise<any> {
+  private togglePublished(payload: TogglePublishedRequest): Promise<TogglePublishedResponse> {
     return this.service.togglePublished(payload);
   }
 }
