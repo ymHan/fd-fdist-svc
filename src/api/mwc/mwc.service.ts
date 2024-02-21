@@ -4,13 +4,7 @@ import { Repository } from 'typeorm';
 
 import { Category, CategorySubEnum, RecordType, CategorySubCodeEnum } from '@enum/index';
 import { User, Video } from '@entities/index';
-import {
-  AddMwcRequest,
-  ExistsMwcRequest,
-  ExistsMwcResponse,
-  TogglePublishedRequest,
-  UpdateVideoMetaInfoRequest,
-} from '@proto/fdist.pb';
+import { AddMwcRequest, ExistsMwcRequest, ExistsMwcResponse, UpdateVideoMetaInfoRequest } from '@proto/fdist.pb';
 import * as fs from 'fs';
 import * as fsp from 'fs/promises';
 import * as dotenv from 'dotenv';
@@ -42,7 +36,7 @@ export class MwcService {
     }
     !!title ? (video.title = title) : null;
     !!subTitle ? (video.subTitle = subTitle) : null;
-    !!description  ? (video.description = description) : null;
+    !!description ? (video.description = description) : null;
 
     const result = await this.videoRepository.save(video);
     return {
