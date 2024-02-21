@@ -167,8 +167,8 @@ export class MwcService {
       `${process.env.MWC_FILE_ROOT}/${userEmail}/${fileName}`,
     );
     await fsp.rename(
-      `${process.env.MWC_FILE_PATH}/${this.getDates()}/${file}.jpg`,
-      `${process.env.MWC_FILE_ROOT}/${userEmail}/${file}.jpg`,
+      `${process.env.MWC_FILE_PATH}/${this.getDates()}/${file}.png`,
+      `${process.env.MWC_FILE_ROOT}/${userEmail}/${file}.png`,
     );
   }
 }

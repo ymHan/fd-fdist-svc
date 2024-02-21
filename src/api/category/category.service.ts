@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Video } from '@entities/index';
 import { GetCategorySubResponse, GetCategoryResponse, GetRecordTypeResponse } from '@proto/fdist.pb';
+import * as dayjs from 'dayjs';
 
 @Injectable()
 export class CategoryService {
@@ -45,6 +46,34 @@ export class CategoryService {
     });
 
     data.sort((a, b) => a.index - b.index);
+
+    const date = dayjs("2024-02-25 09:00:00"); //한시적으로 사용
+    if (!date.isBefore(dayjs())) {
+      const data = [
+        {
+          index: 0,
+          categorySubName: 'GOLF',
+        },
+        {
+          index: 0,
+          categorySubName: 'BALLET',
+        },
+        {
+          index: 0,
+          categorySubName: 'DANCE',
+        },
+        {
+          index: 0,
+          categorySubName: 'My Videos',
+        },
+      ]
+      return {
+        result: 'ok',
+        status: 200,
+        message: 'success',
+        data,
+      };
+    }
 
     return {
       result: 'ok',
