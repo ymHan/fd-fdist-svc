@@ -55,15 +55,15 @@ export class CategoryService {
           categorySubName: 'GOLF',
         },
         {
-          index: 0,
+          index: 1,
           categorySubName: 'BALLET',
         },
         {
-          index: 0,
+          index: 2,
           categorySubName: 'DANCE',
         },
         {
-          index: 0,
+          index: 100,
           categorySubName: 'My Videos',
         },
       ];
