@@ -4,7 +4,13 @@ import { Repository } from 'typeorm';
 
 import { Category, CategorySubEnum, RecordType, CategorySubCodeEnum } from '@enum/index';
 import { User, Video } from '@entities/index';
-import { AddMwcRequest, TogglePublishedRequest, UpdateVideoMetaInfoRequest } from '@proto/fdist.pb';
+import {
+  AddMwcRequest,
+  ExistsMwcRequest,
+  ExistsMwcResponse,
+  TogglePublishedRequest,
+  UpdateVideoMetaInfoRequest,
+} from '@proto/fdist.pb';
 import * as fs from 'fs';
 import * as fsp from 'fs/promises';
 import * as dotenv from 'dotenv';
@@ -47,10 +53,10 @@ export class MwcService {
     };
   }
 
-  public async existMwc(payload: AddMwcRequest): Promise<any> {
-    const { userId, fileName } = payload;
+  public async existsMwc(payload: ExistsMwcRequest): Promise<ExistsMwcResponse> {
+    const { userEmail, fileName } = payload;
     const QueryBuilder = this.videoRepository.createQueryBuilder('video');
-    const video = QueryBuilder.where('video.email = :userId', { userId }).andWhere(
+    const video = QueryBuilder.where('video.email = :userEmail', { userEmail }).andWhere(
       "array_to_string(video.contentUrlList, '||') like %:fileName%",
       { fileName },
     );

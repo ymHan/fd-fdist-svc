@@ -455,6 +455,7 @@ export interface ExistsMwcResponse_DATA {
 }
 
 export interface ExistsMwcRequest {
+  userEmail: string;
   fileName: string;
 }
 

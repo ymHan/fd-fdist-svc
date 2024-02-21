@@ -1,7 +1,13 @@
 import { Controller, Inject } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
 import { MwcService } from './mwc.service';
-import { MWC_SERVICE_NAME, AddMwcRequest, UpdateVideoMetaInfoRequest, UpdateVideoMetaInfoResponse } from '@proto/fdist.pb';
+import {
+  MWC_SERVICE_NAME,
+  AddMwcRequest,
+  UpdateVideoMetaInfoRequest,
+  UpdateVideoMetaInfoResponse,
+  ExistsMwcResponse, ExistsMwcRequest,
+} from '@proto/fdist.pb';
 
 @Controller()
 export class MwcController {
@@ -13,9 +19,9 @@ export class MwcController {
     return this.service.addMwc(payload);
   }
 
-  @GrpcMethod(MWC_SERVICE_NAME, 'existMwc')
-  private existMwc(payload: AddMwcRequest): Promise<any> {
-    return this.service.existMwc(payload);
+  @GrpcMethod(MWC_SERVICE_NAME, 'existsMwc')
+  private existsMwc(payload: ExistsMwcRequest): Promise<ExistsMwcResponse> {
+    return this.service.existsMwc(payload);
   }
 
   @GrpcMethod(MWC_SERVICE_NAME, 'updateVideoMetaInfo')
