@@ -103,6 +103,7 @@ export class VideoService {
     const queryBuilder = this.videoRepository.createQueryBuilder('video');
     const [videos, total] = await queryBuilder
       .where('video.email = :userEmail', { userEmail })
+      .andWhere('video.isDeleted = :isDeleted', { isDeleted: false })
       .skip((page - 1) * limit)
       .orderBy(`video.${sort}`, order.toUpperCase() as 'ASC' | 'DESC')
       .take(limit)
@@ -202,6 +203,7 @@ export class VideoService {
       const queryBuilder = this.videoRepository.createQueryBuilder('video');
       const [videos, total] = await queryBuilder
         .where('video.isPublished = :isPublished', { isPublished: true })
+        .andWhere('video.isDeleted = :isDeleted', { isDeleted: false })
         .getManyAndCount();
 
       return {
@@ -222,6 +224,7 @@ export class VideoService {
       const [videos, total] = await queryBuilder
         .where('video.category = :cat', { cat })
         .andWhere('video.isPublished = :isPublished', { isPublished: true })
+        .andWhere('video.isDeleted = :isDeleted', { isDeleted: false })
         .skip((page - 1) * limit)
         .take(limit)
         .getManyAndCount();
@@ -244,6 +247,7 @@ export class VideoService {
       const [videos, total] = await queryBuilder
         .where('video.categorySub = :cat', { cat })
         .andWhere('video.isPublished = :isPublished', { isPublished: true })
+        .andWhere('video.isDeleted = :isDeleted', { isDeleted: false })
         .skip((page - 1) * limit)
         .take(limit)
         .getManyAndCount();
@@ -266,6 +270,7 @@ export class VideoService {
       const [videos, total] = await queryBuilder
         .where('video.recordType = :cat', { cat })
         .andWhere('video.isPublished = :isPublished', { isPublished: true })
+        .andWhere('video.isDeleted = :isDeleted', { isDeleted: false })
         .skip((page - 1) * limit)
         .take(limit)
         .getManyAndCount();
