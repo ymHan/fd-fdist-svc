@@ -6,7 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { VideoModule } from './api/video/';
 import { CategoryModule } from '@root/api/category';
 import { LikeModule } from '@root/api/like';
-import { MwcEventModule } from '@root/api/mwc';
+import { MwcModule } from '@root/api/mwc';
 
 @Module({
   imports: [
@@ -19,7 +19,7 @@ import { MwcEventModule } from '@root/api/mwc';
     VideoModule,
     CategoryModule,
     LikeModule,
-    MwcEventModule,
+    MwcModule,
   ],
 })
 export class AppModule {}

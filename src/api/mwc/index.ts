@@ -1,1 +1,1 @@
-export * from './mwc-event.module';
+export * from './mwc.module';

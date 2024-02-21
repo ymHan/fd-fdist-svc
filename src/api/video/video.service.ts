@@ -11,7 +11,7 @@ import {
   GetVideoRecordTypeRequest,
   MyVideoListRequest,
   MyVideoExistsRequest,
-  MyVideoExistsResponse,
+  MyVideoExistsResponse, DeleteVideoRequest,
 } from '@proto/fdist.pb';
 import { Category, CategorySubEnum, RecordType } from '@enum/index';
 
@@ -22,6 +22,30 @@ export class VideoService {
 
   @InjectRepository(ReportEntity)
   private readonly reportRepository: Repository<ReportEntity>;
+
+  public async deleteVideo(payload: DeleteVideoRequest): Promise<any> {
+    const { userId, videoId } = payload;
+    const video = await this.videoRepository.findOne({ where: { email: userId, id: videoId, isDeleted: false } });
+    console.log(video);
+    if (!video) {
+      return {
+        result: 'fail',
+        status: 400,
+        message: 'video not found',
+        data: null,
+      };
+    }
+
+    video.isDeleted = !video.isDeleted;
+    await this.videoRepository.save(video);
+
+    return {
+      result: 'ok',
+      status: 200,
+      message: 'success',
+      data: null,
+    };
+  }
 
   public async myVideoExists(payload: MyVideoExistsRequest): Promise<MyVideoExistsResponse> {
     const userEmail = payload.userEmail;

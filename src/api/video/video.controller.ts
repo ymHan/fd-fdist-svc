@@ -2,7 +2,7 @@ import { Controller, Inject } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
 
 import { VideoService } from './video.service';
-import { F_DIST_SERVICE_NAME, GetVideoByIdRequest, GetVideoListRequest } from '@proto/fdist.pb';
+import { F_DIST_SERVICE_NAME, GetVideoByIdRequest, GetVideoListRequest, VIDEO_SERVICE_NAME } from '@proto/fdist.pb';
 
 @Controller()
 export class VideoController {
@@ -37,5 +37,10 @@ export class VideoController {
   @GrpcMethod(F_DIST_SERVICE_NAME, 'myVideoExists')
   private myVideoExists(payload: any): Promise<any> {
     return this.service.myVideoExists(payload);
+  }
+
+  @GrpcMethod(VIDEO_SERVICE_NAME,'deleteVideo')
+  private deleteVideo(payload: any): Promise<any> {
+    return this.service.deleteVideo(payload);
   }
 }

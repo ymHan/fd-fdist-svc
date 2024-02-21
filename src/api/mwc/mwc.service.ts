@@ -4,46 +4,24 @@ import { Repository } from 'typeorm';
 
 import { Category, CategorySubEnum, RecordType, CategorySubCodeEnum } from '@enum/index';
 import { User, Video } from '@entities/index';
-import { AddMwcRequest, TogglePublishedRequest, UpdateVideoMetaInfoRequest, DeleteVideoRequest } from '@proto/fdist.pb';
+import { AddMwcRequest, TogglePublishedRequest, UpdateVideoMetaInfoRequest } from '@proto/fdist.pb';
 import * as fs from 'fs';
 import * as fsp from 'fs/promises';
 import * as dotenv from 'dotenv';
-
 import * as FfmpegCommand from 'fluent-ffmpeg';
+
 FfmpegCommand.setFfprobePath('/usr/bin/ffprobe');
 FfmpegCommand.setFfmpegPath('/usr/bin/ffmpeg');
 
 dotenv.config();
 
 @Injectable()
-export class MwcEventService {
+export class MwcService {
   @InjectRepository(Video)
   private readonly videoRepository: Repository<Video>;
 
   @InjectRepository(User)
   private readonly userRepository: Repository<User>;
-
-  public async DeleteVideo(payload: DeleteVideoRequest): Promise<any> {
-    const { userId, videoId } = payload;
-    const video = await this.videoRepository.findOne({ where: { email: userId, id: videoId } });
-    if (!video) {
-      return {
-        result: 'fail',
-        status: 400,
-        message: 'video not found',
-        data: null,
-      };
-    }
-    video.isDeleted = !video.isDeleted;
-    await this.videoRepository.save(video);
-
-    return {
-      result: 'ok',
-      status: 200,
-      message: 'success',
-      data: null,
-    };
-  }
 
   public async ToggleMwcPublish(payload: TogglePublishedRequest): Promise<any> {
     const { userId, videoId } = payload;
@@ -65,7 +43,8 @@ export class MwcEventService {
       data: result,
     };
   }
-  public async updateMwcMetaInfo(payload: UpdateVideoMetaInfoRequest): Promise<any> {
+
+  public async updateVideoMetaInfo(payload: UpdateVideoMetaInfoRequest): Promise<any> {
     const { userEmail, videoId, title, subTitle, description } = payload;
     const video = await this.videoRepository.findOne({ where: { email: userEmail, id: videoId } });
     if (!video) {
@@ -76,9 +55,9 @@ export class MwcEventService {
         data: null,
       };
     }
-    video.title !== title ? (video.title = title) : null;
-    video.subTitle !== subTitle ? (video.subTitle = subTitle) : null;
-    video.description !== description ? (video.description = description) : null;
+    !!title ? (video.title = title) : null;
+    !!subTitle ? (video.subTitle = subTitle) : null;
+    !!description  ? (video.description = description) : null;
 
     const result = await this.videoRepository.save(video);
     return {
