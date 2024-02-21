@@ -47,7 +47,7 @@ export class CategoryService {
 
     data.sort((a, b) => a.index - b.index);
 
-    const date = dayjs("2024-02-25 09:00:00"); //한시적으로 사용
+    const date = dayjs('2024-02-25 09:00:00'); //한시적으로 사용
     if (!date.isBefore(dayjs())) {
       const data = [
         {
@@ -66,7 +66,7 @@ export class CategoryService {
           index: 0,
           categorySubName: 'My Videos',
         },
-      ]
+      ];
       return {
         result: 'ok',
         status: 200,
