@@ -53,7 +53,7 @@ export class VideoService {
   public async deleteVideo(payload: DeleteVideoRequest): Promise<any> {
     const { userId, videoId } = payload;
     const video = await this.videoRepository.findOne({ where: { email: userId, id: videoId, isDeleted: false } });
-    console.log(video);
+
     if (!video) {
       return {
         result: 'fail',
