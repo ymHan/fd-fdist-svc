@@ -39,8 +39,13 @@ export class VideoController {
     return this.service.myVideoExists(payload);
   }
 
-  @GrpcMethod(VIDEO_SERVICE_NAME,'deleteVideo')
+  @GrpcMethod(VIDEO_SERVICE_NAME, 'deleteVideo')
   private deleteVideo(payload: any): Promise<any> {
     return this.service.deleteVideo(payload);
+  }
+
+  @GrpcMethod(VIDEO_SERVICE_NAME, 'togglePublished')
+  private togglePublished(payload: any): Promise<any> {
+    return this.service.togglePublished(payload);
   }
 }

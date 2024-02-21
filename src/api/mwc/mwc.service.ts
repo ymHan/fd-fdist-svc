@@ -23,27 +23,6 @@ export class MwcService {
   @InjectRepository(User)
   private readonly userRepository: Repository<User>;
 
-  public async ToggleMwcPublish(payload: TogglePublishedRequest): Promise<any> {
-    const { userId, videoId } = payload;
-    const video = await this.videoRepository.findOne({ where: { email: userId, id: videoId } });
-    if (!video) {
-      return {
-        result: 'fail',
-        status: 400,
-        message: 'video not found',
-        data: null,
-      };
-    }
-    video.isPublished = !video.isPublished;
-    const result = await this.videoRepository.save(video);
-    return {
-      result: 'ok',
-      status: 200,
-      message: 'success',
-      data: result,
-    };
-  }
-
   public async updateVideoMetaInfo(payload: UpdateVideoMetaInfoRequest): Promise<any> {
     const { userEmail, videoId, title, subTitle, description } = payload;
     const video = await this.videoRepository.findOne({ where: { email: userEmail, id: videoId } });

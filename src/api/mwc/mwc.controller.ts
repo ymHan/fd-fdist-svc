@@ -1,12 +1,7 @@
 import { Controller, Inject } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
 import { MwcService } from './mwc.service';
-import {
-  MWC_SERVICE_NAME,
-  AddMwcRequest,
-  UpdateVideoMetaInfoRequest,
-  UpdateVideoMetaInfoResponse,
-} from '@proto/fdist.pb';
+import { MWC_SERVICE_NAME, AddMwcRequest, UpdateVideoMetaInfoRequest, UpdateVideoMetaInfoResponse } from '@proto/fdist.pb';
 
 @Controller()
 export class MwcController {
