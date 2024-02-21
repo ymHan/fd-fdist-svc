@@ -40,7 +40,9 @@ export class VideoService {
       result: 'ok',
       status: 200,
       message: 'success',
-      data: result,
+      data: {
+        isPublished: result.isPublished
+      },
     };
   }
 
