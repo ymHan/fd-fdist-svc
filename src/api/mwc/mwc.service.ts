@@ -156,11 +156,11 @@ export class MwcService {
   private async moveFile(fileName: string, userEmail: string) {
     const file = fileName.split('.')[0];
 
-    await fsp.rename(
+    await fsp.cp(
       `${process.env.MWC_FILE_PATH}/${this.getDates()}/${fileName}`,
       `${process.env.MWC_FILE_ROOT}/${userEmail}/${fileName}`,
     );
-    await fsp.rename(
+    await fsp.cp(
       `${process.env.MWC_FILE_PATH}/${this.getDates()}/${file}.png`,
       `${process.env.MWC_FILE_ROOT}/${userEmail}/${file}.png`,
     );
