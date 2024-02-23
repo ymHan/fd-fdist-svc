@@ -289,35 +289,7 @@ export class VideoService {
     }
   }
   async getVideoById(payload: GetVideoByIdRequest): Promise<any> {
-    //const video = await this.videoRepository.findOne({ where: { id: payload.id } });
-    const QueryBuilder = this.videoRepository.createQueryBuilder('video');
-    const video = await QueryBuilder.where('video.id = :id', { id: payload.id })
-      .select([
-        'video.id',
-        'video.title',
-        'video.subTitle',
-        'video.description',
-        'video.ownerName',
-        'video.ownerNickName',
-        'video.ownerChannelName',
-        'video.ownerProfileIconUrl',
-        'video.thumbnailUrl',
-        'video.viewCount',
-        'video.reportCount',
-        'video.likesCount',
-        'video.duration',
-        'video.category',
-        'video.categorySub',
-        'video.categorySubCode',
-        'video.recordType',
-        'video.contentUrlList',
-        'video.poseIndicatorList',
-        'video.nodeId',
-        'video.isPublished',
-        'video.createdAt',
-        'video.updatedAt',
-      ])
-      .getOne();
+    const video = await this.videoRepository.findOne({ where: { id: payload.id } });
 
     if (!video) {
       return {

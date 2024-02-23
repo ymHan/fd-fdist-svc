@@ -267,6 +267,7 @@ export interface IdVideo {
   createdAt: string;
   updatedAt: string;
   thumbnailUrl: string;
+  isPublished: string;
 }
 
 export interface Videos {
