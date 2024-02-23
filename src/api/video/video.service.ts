@@ -289,9 +289,11 @@ export class VideoService {
     }
   }
   async getVideoById(payload: GetVideoByIdRequest): Promise<any> {
-    const video = await this.videoRepository.findOne({ where: { id: payload.id } });
-    video.viewCount += 1;
-    await this.videoRepository.save(video);
+    //const video = await this.videoRepository.findOne({ where: { id: payload.id } });
+    const QueryBuilder = this.videoRepository.createQueryBuilder('video');
+    const video = await QueryBuilder
+      .where('video.id = :id', { id: payload.id })
+      .getOne();
 
     if (!video) {
       return {
@@ -300,6 +302,9 @@ export class VideoService {
         message: 'not found',
       };
     }
+
+    video.viewCount += 1;
+    await this.videoRepository.save(video);
 
     return {
       result: 'ok',
