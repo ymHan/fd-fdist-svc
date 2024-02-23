@@ -108,7 +108,7 @@ export class MwcService {
     video.ownerName = user.name;
     video.ownerNickName = user.nickname;
     video.ownerChannelName = user.nickname;
-    video.ownerProfileIconUrl = 'http://cdn.4dist.com/4dist/default/defaultProfile.png';
+    video.ownerProfileIconUrl = 'http://cdn.4dist.com/de-01/4dist/default/defaultProfile.png';
     video.thumbnailUrl = `http://cdn.4dist.com/de-01/${user.email}/${fileName.split('.')[0]}.png`;
     video.duration = (duration * 1000).toString() || '0';
     video.category = Category.ENTERTAINMENTS;
