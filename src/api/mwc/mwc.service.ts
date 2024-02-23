@@ -75,7 +75,7 @@ export class MwcService {
   public async addMwc(payload: AddMwcRequest): Promise<any> {
     const { userId, fileName } = payload;
     const user = await this.userRepository.findOne({ where: { email: userId } });
-    const file = fs.existsSync(`${process.env.MWC_FILE_PATH}/${this.getDates()}/${fileName}`);
+    const file = fs.existsSync(`${process.env.MWC_FILE_PATH_DE}/${this.getDates()}/${fileName}`);
     if (!user) {
       return {
         result: 'fail',
@@ -109,13 +109,13 @@ export class MwcService {
     video.ownerNickName = user.nickname;
     video.ownerChannelName = user.nickname;
     video.ownerProfileIconUrl = 'http://cdn.4dist.com/4dist/default/defaultProfile.png';
-    video.thumbnailUrl = `http://cdn.4dist.com/${user.email}/${fileName.split('.')[0]}.png`;
+    video.thumbnailUrl = `http://cdn.4dist.com/de-01/${user.email}/${fileName.split('.')[0]}.png`;
     video.duration = (duration * 1000).toString() || '0';
     video.category = Category.ENTERTAINMENTS;
     video.categorySub = CategorySubEnum.MWC;
     video.categorySubCode = CategorySubCodeEnum.MWC;
     video.recordType = RecordType.SHORTS;
-    video.contentUrlList = [`http://cdn.4dist.com/${user.email}/${fileName}`];
+    video.contentUrlList = [`http://cdn.4dist.com/de-01/${user.email}/${fileName}`];
     video.poseIndicatorList = [];
     video.nodeId = 'MWC0001001001';
 
@@ -144,7 +144,7 @@ export class MwcService {
 
   private async getDuration(fileName: string): Promise<number> {
     return new Promise((resolve, reject) => {
-      FfmpegCommand.ffprobe(`${process.env.MWC_FILE_PATH}/${this.getDates()}/${fileName}`, (err, metadata) => {
+      FfmpegCommand.ffprobe(`${process.env.MWC_FILE_PATH_DE}/${this.getDates()}/${fileName}`, (err, metadata) => {
         if (err) {
           reject(err);
         }
@@ -157,12 +157,12 @@ export class MwcService {
     const file = fileName.split('.')[0];
 
     await fsp.cp(
-      `${process.env.MWC_FILE_PATH}/${this.getDates()}/${fileName}`,
-      `${process.env.MWC_FILE_ROOT}/${userEmail}/${fileName}`,
+      `${process.env.MWC_FILE_PATH_DE}/${this.getDates()}/${fileName}`,
+      `${process.env.MWC_FILE_ROOT_DE}/${userEmail}/${fileName}`,
     );
     await fsp.cp(
-      `${process.env.MWC_FILE_PATH}/${this.getDates()}/${file}.png`,
-      `${process.env.MWC_FILE_ROOT}/${userEmail}/${file}.png`,
+      `${process.env.MWC_FILE_PATH_DE}/${this.getDates()}/${file}.png`,
+      `${process.env.MWC_FILE_ROOT_DE}/${userEmail}/${file}.png`,
     );
   }
 }
