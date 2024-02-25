@@ -47,6 +47,8 @@ export class CategoryService {
       };
     });
 
+    data[1].index = 100;
+
     const date = dayjs('2024-02-25 09:00:00'); //한시적으로 사용
     if (!date.isBefore(dayjs())) {
       const data = [
