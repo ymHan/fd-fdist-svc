@@ -31,7 +31,7 @@ export class CategoryService {
   }
 
   public async getCategories(): Promise<GetCategorySubResponse> {
-    let num = 2;
+    let num = 1;
     const categories = await this.videoRepository.createQueryBuilder('video').select('DISTINCT "categorySub"').getRawMany();
     const data = categories.map((category) => {
       return {
@@ -46,7 +46,7 @@ export class CategoryService {
     });
 
     data.push({
-      index: 1,
+      index: 100,
       categorySubName: 'My Videos',
     })
 
