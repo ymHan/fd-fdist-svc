@@ -31,26 +31,29 @@ export class CategoryService {
   }
 
   public async getCategories(): Promise<GetCategorySubResponse> {
-    let num = 1;
+    let num = 1, sort = 2;
     const categories = await this.videoRepository.createQueryBuilder('video').select('DISTINCT "categorySub"').getRawMany();
     const data = categories.map((category) => {
       return {
         index: num++,
+        sort: sort++,
         categorySubName: category.categorySub,
       };
     });
 
     data.push({
       index: 0,
+      sort: 0,
       categorySubName: 'ALL',
     });
 
     data.push({
       index: 100,
+      sort: 1,
       categorySubName: 'My Videos',
     })
 
-    data.sort((a, b) => a.index - b.index);
+    data.sort((a, b) => a.sort - b.sort);
 
     const date = dayjs('2024-02-25 09:00:00'); //한시적으로 사용
     if (!date.isBefore(dayjs())) {
