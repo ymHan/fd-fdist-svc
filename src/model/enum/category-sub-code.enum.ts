@@ -14,4 +14,5 @@ export enum CategorySubCodeEnum {
   FIGURESKATING = 'S_FSK', // 피겨스케이팅
   HIGHJUMP = 'S_ATH', // 높이뛰기
   MWC = 'S_MWC', // MWC
+  EVENT = 'S_EVT', // 이벤트
 }

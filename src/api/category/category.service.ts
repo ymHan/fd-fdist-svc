@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Video } from '@entities/index';
+import { Video, SubCategory } from '@entities/index';
 import { GetCategorySubResponse, GetCategoryResponse, GetRecordTypeResponse } from '@proto/fdist.pb';
 import * as dayjs from 'dayjs';
 
@@ -9,6 +9,9 @@ import * as dayjs from 'dayjs';
 export class CategoryService {
   @InjectRepository(Video)
   private readonly videoRepository: Repository<Video>;
+
+  @InjectRepository(SubCategory)
+  private readonly subCategoryRepository: Repository<SubCategory>;
 
   public async getCategory(): Promise<GetCategoryResponse> {
     let num = 0;
@@ -31,29 +34,18 @@ export class CategoryService {
   }
 
   public async getCategories(): Promise<GetCategorySubResponse> {
-    let num = 1, sort = 2;
-    const categories = await this.videoRepository.createQueryBuilder('video').select('DISTINCT "categorySub"').getRawMany();
+    let num = 1;
+    const categories = await this.subCategoryRepository
+      .createQueryBuilder('sub_category')
+      .select('sort, name')
+      .orderBy('sort', 'ASC')
+      .getRawMany();
     const data = categories.map((category) => {
       return {
         index: num++,
-        sort: sort++,
-        categorySubName: category.categorySub,
+        categorySubName: category.name,
       };
     });
-
-    data.push({
-      index: 0,
-      sort: 0,
-      categorySubName: 'ALL',
-    });
-
-    data.push({
-      index: 100,
-      sort: 1,
-      categorySubName: 'My Videos',
-    })
-
-    data.sort((a, b) => a.sort - b.sort);
 
     const date = dayjs('2024-02-25 09:00:00'); //한시적으로 사용
     if (!date.isBefore(dayjs())) {
