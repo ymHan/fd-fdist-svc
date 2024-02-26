@@ -131,15 +131,10 @@ export class MwcService {
   }
 
   private getDates() {
-    let months = '';
-    const date = new Date();
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    if (month < 10) {
-      months = `0${month}`;
-    }
-    const day = date.getDate();
-    return `${year}${months}${day}`;
+    const date = new Date().toISOString();
+    const formattedDate = date.split('T')[0];
+
+    return formattedDate.replace(/-/g, '');
   }
 
   private async getDuration(fileName: string): Promise<number> {
