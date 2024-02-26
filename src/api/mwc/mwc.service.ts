@@ -75,8 +75,9 @@ export class MwcService {
   public async addMwc(payload: AddMwcRequest): Promise<any> {
     console.log('addMwc', payload)
     const { userId, fileName } = payload;
+    const realFileName = `${fileName.split('.')[0]}.mp4`;
     const user = await this.userRepository.findOne({ where: { email: userId } });
-    const file = fs.existsSync(`${process.env.MWC_FILE_PATH_DE}/${this.getDates()}/${fileName.split('.')[0]}.mp4`);
+    const file = fs.existsSync(`${process.env.MWC_FILE_PATH_DE}/${this.getDates()}/${realFileName}`);
     console.log(file)
     if (!user) {
       return {
@@ -100,7 +101,7 @@ export class MwcService {
       await fsp.mkdir(`${process.env.MWC_FILE_ROOT}/${userId}`);
     }
 
-    const duration: number = await this.getDuration(fileName);
+    const duration: number = await this.getDuration(realFileName);
     const video = new Video();
 
     video.email = user.email;
@@ -111,18 +112,18 @@ export class MwcService {
     video.ownerNickName = user.nickname;
     video.ownerChannelName = user.nickname;
     video.ownerProfileIconUrl = 'http://cdn.4dist.com/de-01/4dist/default/defaultProfile.png';
-    video.thumbnailUrl = `http://cdn.4dist.com/de-01/${user.email}/${fileName.split('.')[0]}.jpg`;
+    video.thumbnailUrl = `http://cdn.4dist.com/de-01/${user.email}/${realFileName.split('.')[0]}.jpg`;
     video.duration = (duration * 1000).toString() || '0';
     video.category = Category.ENTERTAINMENTS;
     video.categorySub = CategorySubEnum.MWC;
     video.categorySubCode = CategorySubCodeEnum.MWC;
     video.recordType = RecordType.SHORTS;
-    video.contentUrlList = [`http://cdn.4dist.com/de-01/${user.email}/${fileName}`];
+    video.contentUrlList = [`http://cdn.4dist.com/de-01/${user.email}/${realFileName}`];
     video.poseIndicatorList = [];
     video.nodeId = 'MWC0001001001';
 
     const returnData = await this.videoRepository.save(video);
-    await this.moveFile(fileName, user.email);
+    await this.moveFile(realFileName, user.email);
 
     return {
       result: 'ok',
