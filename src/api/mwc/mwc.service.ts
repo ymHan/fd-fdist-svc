@@ -75,7 +75,7 @@ export class MwcService {
   public async addMwc(payload: AddMwcRequest): Promise<any> {
     const { userId, fileName } = payload;
     const user = await this.userRepository.findOne({ where: { email: userId } });
-    const file = fs.existsSync(`${process.env.MWC_FILE_PATH_DE}/${this.getDates()}/${fileName}`);
+    const file = fs.existsSync(`${process.env.MWC_FILE_PATH_DE}/${this.getDates()}/${fileName.split('.')[0]}.mp4`);
     if (!user) {
       return {
         result: 'fail',
