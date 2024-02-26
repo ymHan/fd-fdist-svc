@@ -376,6 +376,16 @@ export interface ContentItem {
   streamingUrl: string;
 }
 
+export interface AddHtmlRequest {
+  fileName: string;
+}
+
+export interface AddHtmlResponse {
+  result: string;
+  status: number;
+  message: string;
+}
+
 export interface ExistsVideoRequest {
   userEmail: string;
 }
@@ -674,6 +684,8 @@ export interface MwcServiceClient {
   updateVideoMetaInfo(request: UpdateVideoMetaInfoRequest): Observable<UpdateVideoMetaInfoResponse>;
 
   existsVideo(request: ExistsVideoRequest): Observable<ExistsVideoResponse>;
+
+  addHtml(request: AddHtmlRequest): Observable<AddHtmlResponse>;
 }
 
 export interface MwcServiceController {
@@ -688,11 +700,13 @@ export interface MwcServiceController {
   existsVideo(
     request: ExistsVideoRequest,
   ): Promise<ExistsVideoResponse> | Observable<ExistsVideoResponse> | ExistsVideoResponse;
+
+  addHtml(request: AddHtmlRequest): Promise<AddHtmlResponse> | Observable<AddHtmlResponse> | AddHtmlResponse;
 }
 
 export function MwcServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ["addMwc", "existsMwc", "updateVideoMetaInfo", "existsVideo"];
+    const grpcMethods: string[] = ["addMwc", "existsMwc", "updateVideoMetaInfo", "existsVideo", "addHtml"];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
       GrpcMethod("MwcService", method)(constructor.prototype[method], method, descriptor);

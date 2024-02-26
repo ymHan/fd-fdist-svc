@@ -109,7 +109,7 @@ export class MwcService {
     video.ownerNickName = user.nickname;
     video.ownerChannelName = user.nickname;
     video.ownerProfileIconUrl = 'http://cdn.4dist.com/de-01/4dist/default/defaultProfile.png';
-    video.thumbnailUrl = `http://cdn.4dist.com/de-01/${user.email}/${fileName.split('.')[0]}.png`;
+    video.thumbnailUrl = `http://cdn.4dist.com/de-01/${user.email}/${fileName.split('.')[0]}.jpg`;
     video.duration = (duration * 1000).toString() || '0';
     video.category = Category.ENTERTAINMENTS;
     video.categorySub = CategorySubEnum.MWC;
@@ -161,8 +161,8 @@ export class MwcService {
       `${process.env.MWC_FILE_ROOT_DE}/${userEmail}/${fileName}`,
     );
     await fsp.cp(
-      `${process.env.MWC_FILE_PATH_DE}/${this.getDates()}/${file}.png`,
-      `${process.env.MWC_FILE_ROOT_DE}/${userEmail}/${file}.png`,
+      `${process.env.MWC_FILE_PATH_DE}/${this.getDates()}/${file}.jpg`,
+      `${process.env.MWC_FILE_ROOT_DE}/${userEmail}/${file}.jpg`,
     );
   }
 }
