@@ -6,7 +6,8 @@ import {
   AddMwcRequest,
   UpdateVideoMetaInfoRequest,
   UpdateVideoMetaInfoResponse,
-  ExistsMwcResponse, ExistsMwcRequest,
+  ExistsMwcResponse,
+  ExistsMwcRequest,
 } from '@proto/fdist.pb';
 
 @Controller()
