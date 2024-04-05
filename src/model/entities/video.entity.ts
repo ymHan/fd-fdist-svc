@@ -89,4 +89,7 @@ export class Video extends BaseEntity {
 
   @DeleteDateColumn({ name: 'deletedAt', comment: '삭제일' })
   deletedAt?: Date | null;
+
+  @Column('text', { array: true, nullable: true })
+  channelList?: string[] | null;
 }
