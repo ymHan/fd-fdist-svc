@@ -9,4 +9,5 @@ export enum SportsSubCategory {
   JUDO = 'JUDO', // 유도
   FIGURESKATING = 'FIGURESKATING', // 피겨스케이팅
   HIGHJUMP = 'HIGHJUMP', // 높이뛰기
+  SHORTTRACK = 'SHORTTRACK' // 쇼트트랙
 }

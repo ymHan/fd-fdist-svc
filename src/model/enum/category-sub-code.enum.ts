@@ -15,4 +15,5 @@ export enum CategorySubCodeEnum {
   HIGHJUMP = 'S_ATH', // 높이뛰기
   MWC = 'S_MWC', // MWC
   EVENT = 'P_EVT', // 이벤트
+  SHOORTTRACK = 'S_STK'
 }

@@ -9,4 +9,5 @@ export enum SportsSubCategoryCode {
   JUDO = 'S_JUD', // 유도
   FIGURESKATING = 'S_FSK', // 피겨스케이팅
   HIGHJUMP = 'S_ATH', // 높이뛰기
+  SHORTTRACK = 'S_STK' //
 }
