@@ -76,6 +76,7 @@ export interface MyVideoListResponse_DATA {
   updatedAt: string;
   thumbnailUrl: string;
   isPublished: string;
+  channelList: string[];
 }
 
 export interface MyVideoListResponse_Meta {
@@ -147,6 +148,7 @@ export interface GetVideoRecordTypeResponse_DATA {
   createdAt: string;
   updatedAt: string;
   thumbnailUrl: string;
+  channelList: string[];
 }
 
 export interface GetVideoRecordTypeResponse_Meta {
@@ -268,6 +270,7 @@ export interface IdVideo {
   updatedAt: string;
   thumbnailUrl: string;
   isPublished: string;
+  channelList: string[];
 }
 
 export interface Videos {
@@ -294,6 +297,7 @@ export interface Videos {
   createdAt: string;
   updatedAt: string;
   thumbnailUrl: string;
+  channelList: string[];
 }
 
 export interface GetVideoByIdResponse {
@@ -435,6 +439,7 @@ export interface UpdateVideoMetaInfoResponse_DATA {
   createdAt: string;
   updatedAt: string;
   thumbnailUrl: string;
+  channelList: string[];
 }
 
 export interface ExistsMwcResponse {
@@ -468,6 +473,7 @@ export interface ExistsMwcResponse_DATA {
   createdAt: string;
   updatedAt: string;
   thumbnailUrl: string;
+  channelList: string[];
 }
 
 export interface ExistsMwcRequest {
@@ -511,6 +517,7 @@ export interface AddMwcResponse_DATA {
   createdAt: string;
   updatedAt: string;
   thumbnailUrl: string;
+  channelList: string[];
 }
 
 export const FDIST_PACKAGE_NAME = "fdist";
