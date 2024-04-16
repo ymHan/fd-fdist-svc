@@ -7,8 +7,11 @@ import {
   GetVideoByIdRequest,
   GetVideoListRequest, TogglePublishedRequest,
   TogglePublishedResponse,
+  addTmpVideoRequest,
+  VideoUploadRequest,
   VIDEO_SERVICE_NAME,
 } from '@proto/fdist.pb';
+
 
 @Controller()
 export class VideoController {
@@ -53,5 +56,16 @@ export class VideoController {
   @GrpcMethod(VIDEO_SERVICE_NAME, 'togglePublished')
   private togglePublished(payload: TogglePublishedRequest): Promise<TogglePublishedResponse> {
     return this.service.togglePublished(payload);
+  }
+
+  @GrpcMethod(VIDEO_SERVICE_NAME, 'shootingVideo')
+  private shootingVideo(payload: addTmpVideoRequest): Promise<any> {
+    console.log('shootingVideo', payload);
+    return this.service.addTmpVideo(payload);
+  }
+
+  @GrpcMethod(VIDEO_SERVICE_NAME, 'videoUpload')
+  private videoUpload(payload: VideoUploadRequest): Promise<any> {
+    return this.service.videoUpload(payload);
   }
 }

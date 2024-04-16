@@ -17,8 +17,9 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "proto:install": "npm i git+https://github.com/ymHan/fd-proto.git",
-    "proto:all": "protoc --plugin=node_modules/.bin/protoc-gen-ts_proto -I=./node_modules/fd-proto/proto --ts_proto_out=src/proto/ node_modules/fd-proto/proto/fdist.proto --ts_proto_opt=nestJs=true --ts_proto_opt=fileSuffix=.pb",
-    "proto": "npm run proto:install && npm run proto:all"
+    "proto:fdist": "protoc --plugin=node_modules/.bin/protoc-gen-ts_proto -I=./node_modules/fd-proto/proto --ts_proto_out=src/proto/ node_modules/fd-proto/proto/fdist.proto --ts_proto_opt=nestJs=true --ts_proto_opt=fileSuffix=.pb",
+    "proto:video": "protoc --plugin=node_modules/.bin/protoc-gen-ts_proto -I=./node_modules/fd-proto/proto --ts_proto_out=src/proto/ node_modules/fd-proto/proto/video.proto --ts_proto_opt=nestJs=true --ts_proto_opt=fileSuffix=.pb",
+    "proto": "npm run proto:install && npm run proto:fdist && npm run proto:video"
   },
   "keywords": [],
   "author": "",

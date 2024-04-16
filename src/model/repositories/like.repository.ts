@@ -1,6 +1,6 @@
 import { Repository } from 'typeorm';
 import { CustomRepository } from '@config/typeorm/typeorm-ex.decorator';
-import { Like } from '@entities/index';
+import { LikeEntity } from '@/model/entities';
 
-@CustomRepository(Like)
-export class LikeRepository extends Repository<Like> {}
+@CustomRepository(LikeEntity)
+export class LikeRepository extends Repository<LikeEntity> {}

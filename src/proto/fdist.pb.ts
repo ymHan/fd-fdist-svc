@@ -5,6 +5,26 @@ import { Empty } from "./google/protobuf/empty.pb";
 
 export const protobufPackage = "fdist";
 
+export interface VideoUploadRequest {
+  tempId: string;
+}
+
+export interface VideoUploadResponse {
+  id: number;
+  tempId: string;
+}
+
+export interface addTmpVideoRequest {
+  tempId: string;
+  ownerEmail: string;
+  nodeId: string;
+}
+
+export interface addTmpVideoResponse {
+  id: number;
+  tempId: string;
+}
+
 export interface TogglePublishedRequest {
   userId: string;
   videoId: number;
@@ -526,6 +546,10 @@ export interface VideoServiceClient {
   togglePublished(request: TogglePublishedRequest): Observable<TogglePublishedResponse>;
 
   deleteVideo(request: DeleteVideoRequest): Observable<DeleteVideoResponse>;
+
+  shootingVideo(request: addTmpVideoRequest): Observable<addTmpVideoResponse>;
+
+  videoUpload(request: VideoUploadRequest): Observable<VideoUploadResponse>;
 }
 
 export interface VideoServiceController {
@@ -536,11 +560,19 @@ export interface VideoServiceController {
   deleteVideo(
     request: DeleteVideoRequest,
   ): Promise<DeleteVideoResponse> | Observable<DeleteVideoResponse> | DeleteVideoResponse;
+
+  shootingVideo(
+    request: addTmpVideoRequest,
+  ): Promise<addTmpVideoResponse> | Observable<addTmpVideoResponse> | addTmpVideoResponse;
+
+  videoUpload(
+    request: VideoUploadRequest,
+  ): Promise<VideoUploadResponse> | Observable<VideoUploadResponse> | VideoUploadResponse;
 }
 
 export function VideoServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ["togglePublished", "deleteVideo"];
+    const grpcMethods: string[] = ["togglePublished", "deleteVideo", "shootingVideo", "videoUpload"];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
       GrpcMethod("VideoService", method)(constructor.prototype[method], method, descriptor);

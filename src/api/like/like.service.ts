@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Like } from '@entities/index';
+import { LikeEntity } from '@/model/entities/';
 import { Video } from '@entities/index';
 import { GetLikeCheckRequest, GetLikeCheckResponse, ToggleLikeRequest, ToggleLikeResponse } from '@proto/fdist.pb';
 
 @Injectable()
 export class LikeService {
-  @InjectRepository(Like)
-  private readonly likeRepository: Repository<Like>;
+  @InjectRepository(LikeEntity)
+  private readonly likeRepository: Repository<LikeEntity>;
   @InjectRepository(Video)
   private readonly videoRepository: Repository<Video>;
 
@@ -63,7 +63,7 @@ export class LikeService {
         ],
       };
     } else {
-      const like = new Like();
+      const like = new LikeEntity();
       like.userId = payload.userId;
       like.videoId = payload.videoId;
       await this.likeRepository.save(like);

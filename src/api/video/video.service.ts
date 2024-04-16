@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Video } from '@entities/index';
-import { ReportEntity } from '@entities/report.entity';
+import { ReportEntity, Video, VideoEntity, UserAccountEntity } from '@/model/entities';
 import {
   GetVideoByIdRequest,
   GetVideoListRequest,
@@ -15,16 +14,62 @@ import {
   DeleteVideoRequest,
   TogglePublishedRequest,
   TogglePublishedResponse,
+  addTmpVideoRequest,
+  VideoUploadRequest,
+  VideoUploadResponse,
 } from '@proto/fdist.pb';
 import { Category, CategorySubEnum, RecordType } from '@enum/index';
 
 @Injectable()
 export class VideoService {
+  @InjectRepository(UserAccountEntity)
+  private readonly userRepository: Repository<UserAccountEntity>;
+
   @InjectRepository(Video)
   private readonly videoRepository: Repository<Video>;
 
   @InjectRepository(ReportEntity)
   private readonly reportRepository: Repository<ReportEntity>;
+
+  @InjectRepository(VideoEntity)
+  private readonly videoEntityRepository: Repository<VideoEntity>;
+
+  //category를 분류한다.
+  getCategory(str: string): string {
+    const cat= str.substring(0,1);
+    let category;
+    switch(cat){
+      case 'S':
+        category = 'SPORTS';
+        break;
+      case 'E':
+        category = 'ENTERTAINMENTS';
+        break;
+      case 'P':
+        category = 'PROMOTION';
+        break;
+    }
+    return category;
+  }
+
+  //임시로 영상 정보를 입력한다.
+  public async addTmpVideo(payload: addTmpVideoRequest): Promise<any> {
+    const { tempId, nodeId, ownerEmail } = payload;
+    const user = await this.userRepository.findOne({ where: { email: ownerEmail } });
+    const id = parseInt(nodeId.substring(5, 6), 10);
+    const subCode = nodeId.substring(0, 5);
+    const newVideo = {
+      tempId,
+      nodeId,
+      category: this.getCategory(subCode),
+      userId: user.id,
+      categorySub: subCode,
+      categorySubCode: subCode,
+      recordType: null,
+    };
+
+    await this.addTempVideo(id, newVideo);
+  }
 
   public async togglePublished(payload: TogglePublishedRequest): Promise<TogglePublishedResponse> {
     const { userId, videoId } = payload;
@@ -333,6 +378,77 @@ export class VideoService {
           result: true,
         },
       ],
+    };
+  }
+
+  private async addTempVideo(item: number, newVideo: any) {
+    switch (item) {
+      case 7:
+        for (const recordType of Object.values(RecordType)) {
+          newVideo.recordType = recordType;
+          await this.videoEntityRepository.insert(newVideo);
+        }
+        break;
+      case 6:
+        for (const recordType of Object.values(RecordType)) {
+          if (recordType !== RecordType.ASSISTS) {
+            newVideo.recordType = recordType;
+            await this.videoEntityRepository.insert(newVideo);
+          }
+        }
+        break;
+      case 5:
+        for (const recordType of Object.values(RecordType)) {
+          if (recordType !== RecordType.SHORTS) {
+            newVideo.recordType = recordType;
+            await this.videoEntityRepository.insert(newVideo);
+          }
+        }
+        break;
+      case 4:
+        for (const recordType of Object.values(RecordType)) {
+          if (recordType !== RecordType.SHORTSX) {
+            newVideo.recordType = recordType;
+            await this.videoEntityRepository.insert(newVideo);
+          }
+        }
+        break;
+      case 3:
+        newVideo.recordType = RecordType.SHORTSX;
+        await this.videoEntityRepository.save(newVideo);
+        break;
+      case 2:
+        newVideo.recordType = RecordType.SHORTS;
+        await this.videoEntityRepository.save(newVideo);
+        break;
+      case 1:
+        newVideo.recordType = RecordType.ASSISTS;
+        await this.videoEntityRepository.save(newVideo);
+        break;
+    }
+  }
+
+  async videoUpload(payload: any): Promise<VideoUploadResponse> {
+    const { tempId, recordType, contents } = payload;
+    const video = await this.videoEntityRepository.findOne({ where: { tempId, recordType } });
+    video.title = 'title';
+    video.sub_title = 'sub_title';
+    video.description = 'description';
+    video.url = 'url';
+    video.video_files = ['video_files'];
+    video.meta = ['meta'];
+
+    if (recordType === RecordType.SHORTSX) {
+      video.channelList = ['channelList'];
+    }
+    video.thumbnail = ['thumbnail'];
+    video.duration = 'duration';
+
+    await this.videoEntityRepository.save(video);
+
+    return {
+      id: video.id,
+      tempId: video.tempId,
     };
   }
 }
