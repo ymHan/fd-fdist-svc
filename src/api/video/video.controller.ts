@@ -60,12 +60,11 @@ export class VideoController {
 
   @GrpcMethod(VIDEO_SERVICE_NAME, 'shootingVideo')
   private shootingVideo(payload: addTmpVideoRequest): Promise<any> {
-    console.log('shootingVideo', payload);
     return this.service.addTmpVideo(payload);
   }
 
   @GrpcMethod(VIDEO_SERVICE_NAME, 'videoUpload')
-  private videoUpload(payload: VideoUploadRequest): Promise<any> {
+  private videoUpload(payload: any): Promise<any> {
     return this.service.videoUpload(payload);
   }
 }

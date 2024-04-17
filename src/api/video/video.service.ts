@@ -19,6 +19,7 @@ import {
   VideoUploadResponse,
 } from '@proto/fdist.pb';
 import { Category, CategorySubEnum, RecordType } from '@enum/index';
+import * as dayjs from 'dayjs';
 
 @Injectable()
 export class VideoService {
@@ -33,43 +34,6 @@ export class VideoService {
 
   @InjectRepository(VideoEntity)
   private readonly videoEntityRepository: Repository<VideoEntity>;
-
-  //category를 분류한다.
-  getCategory(str: string): string {
-    const cat = str.substring(0, 1);
-    let category: string;
-    switch (cat) {
-      case 'S':
-        category = 'SPORTS';
-        break;
-      case 'E':
-        category = 'ENTERTAINMENTS';
-        break;
-      case 'P':
-        category = 'PROMOTION';
-        break;
-    }
-    return category;
-  }
-
-  //임시로 영상 정보를 입력한다.
-  public async addTmpVideo(payload: addTmpVideoRequest): Promise<any> {
-    const { tempId, nodeId, ownerEmail } = payload;
-    const user = await this.userRepository.findOne({ where: { email: ownerEmail } });
-    const id = parseInt(nodeId.substring(5, 6), 10);
-    const subCode = nodeId.substring(0, 5);
-    const newVideo = {
-      tempId,
-      nodeId,
-      category: this.getCategory(subCode),
-      userId: user.id,
-      categorySub: subCode,
-      categorySubCode: subCode,
-      recordType: null,
-    };
-
-    await this.addTempVideo(id, newVideo);
-  }
 
   public async togglePublished(payload: TogglePublishedRequest): Promise<TogglePublishedResponse> {
     const { userId, videoId } = payload;
@@ -381,6 +345,43 @@ export class VideoService {
     };
   }
 
+  //category를 분류한다.
+  getCategory(str: string): string {
+    const cat = str.substring(0, 1);
+    let category: string;
+    switch (cat) {
+      case 'S':
+        category = 'SPORTS';
+        break;
+      case 'E':
+        category = 'ENTERTAINMENTS';
+        break;
+      case 'P':
+        category = 'PROMOTION';
+        break;
+    }
+    return category;
+  }
+
+  //임시로 영상 정보를 입력한다.
+  public async addTmpVideo(payload: addTmpVideoRequest): Promise<any> {
+    const { tempId, nodeId, ownerEmail } = payload;
+    const user = await this.userRepository.findOne({ where: { email: ownerEmail } });
+    const id = parseInt(nodeId.substring(5, 6), 10);
+    const subCode = nodeId.substring(0, 5);
+    const newVideo = {
+      tempId,
+      nodeId,
+      category: this.getCategory(subCode),
+      categorySub: subCode,
+      categorySubCode: subCode,
+      user,
+      recordType: null,
+    };
+
+    await this.addTempVideo(id, newVideo);
+  }
+
   private async addTempVideo(item: number, newVideo: any) {
     switch (item) {
       case 7:
@@ -393,58 +394,73 @@ export class VideoService {
         break;
       case 6:
         for (const recordType of Object.values(RecordType)) {
-          if (recordType !== RecordType.ASSISTS && recordType !== RecordType.CASTS) {
-            newVideo.recordType = recordType;
-            await this.videoEntityRepository.insert(newVideo);
+          if (recordType !== RecordType.ASSISTS) {
+            if (recordType !== RecordType.CASTS) {
+              newVideo.recordType = recordType;
+              await this.videoEntityRepository.insert(newVideo);
+            }
           }
         }
         break;
       case 5:
         for (const recordType of Object.values(RecordType)) {
-          if (recordType !== RecordType.SHORTS && recordType !== RecordType.CASTS) {
-            newVideo.recordType = recordType;
-            await this.videoEntityRepository.insert(newVideo);
+          if (recordType !== RecordType.SHORTS) {
+            if (recordType !== RecordType.CASTS) {
+              newVideo.recordType = recordType;
+              await this.videoEntityRepository.insert(newVideo);
+            }
           }
         }
         break;
       case 4:
         for (const recordType of Object.values(RecordType)) {
-          if (recordType !== RecordType.SHORTSX && recordType !== RecordType.CASTS) {
-            newVideo.recordType = recordType;
-            await this.videoEntityRepository.insert(newVideo);
+          if (recordType !== RecordType.SHORTSX) {
+            if (recordType !== RecordType.CASTS) {
+              newVideo.recordType = recordType;
+              await this.videoEntityRepository.insert(newVideo);
+            }
           }
         }
         break;
       case 3:
         newVideo.recordType = RecordType.SHORTSX;
-        await this.videoEntityRepository.save(newVideo);
+        await this.videoEntityRepository.insert(newVideo);
         break;
       case 2:
         newVideo.recordType = RecordType.SHORTS;
-        await this.videoEntityRepository.save(newVideo);
+        await this.videoEntityRepository.insert(newVideo);
         break;
       case 1:
         newVideo.recordType = RecordType.ASSISTS;
-        await this.videoEntityRepository.save(newVideo);
+        await this.videoEntityRepository.insert(newVideo);
         break;
     }
   }
 
-  async videoUpload(payload: any): Promise<VideoUploadResponse> {
-    const { tempId, recordType, contents } = payload;
-    const video = await this.videoEntityRepository.findOne({ where: { tempId, recordType } });
+  async videoUpload(payload: any): Promise<any> {
+    const { tempId, category, recordType, contents } = payload;
+    const video = await this.videoEntityRepository.findOne({
+      where: { tempId, recordType: recordType.toUpperCase()},
+      relations: ['user'],
+    });
 
-    video.title = 'title';
-    video.sub_title = 'sub_title';
-    video.description = 'description';
+    video.title = await this.makeTitles(video.nodeId);
+    video.sub_title = await this.makeTitles(video.nodeId);
+    video.description = await this.makeTitles(video.nodeId);
     video.video_files = contents;
     video.meta = this.makeMeta(contents, recordType);
     video.isStatus = true;
+    video.file_path = this.makeFilePath(video.user.email)
+    video.thumbnail = this.makeThumbnail(contents, recordType);
+    video.duration = this.makeDuration(contents);
+
     await this.videoEntityRepository.save(video);
 
     return {
-      id: video.id,
+      videoId: video.id,
+      userId: video.user.id,
       tempId: video.tempId,
+      recordType: video.recordType,
     };
   }
 
@@ -456,5 +472,35 @@ export class VideoService {
       }
     }
     return meta;
+  }
+
+  makeFilePath(userEmail: string): string {
+    const Dates = dayjs(new Date()).format('YYYYMMDD');
+    return `/${userEmail}/${Dates}/video/`;
+  }
+
+  makeThumbnail(contents: Array<string>, recordType: string): Array<string> {
+    const thumbnail = [];
+    if (recordType === RecordType.ASSISTS.toLowerCase()) {
+      for (const content of contents) {
+        thumbnail.push(content.replace('mp4', 'jpg'));
+      }
+    }
+    return thumbnail;
+  }
+
+  makeDuration(contents: Array<string>): string {
+    return 'duration';
+  }
+
+  async makeTitles(nodeId: string): Promise<string> {
+    const sportsId = nodeId.substring(0, 5);
+    const customerId = nodeId.substring(6, 10);
+    const venueId = nodeId.substring(10, 13);
+    const sectorId: string = nodeId.substring(13,16);
+
+
+
+    return 'Panasonic Open Championship 2024';
   }
 }
