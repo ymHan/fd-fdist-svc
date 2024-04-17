@@ -36,9 +36,9 @@ export class VideoService {
 
   //category를 분류한다.
   getCategory(str: string): string {
-    const cat= str.substring(0,1);
-    let category;
-    switch(cat){
+    const cat = str.substring(0, 1);
+    let category: string;
+    switch (cat) {
       case 'S':
         category = 'SPORTS';
         break;
@@ -385,13 +385,15 @@ export class VideoService {
     switch (item) {
       case 7:
         for (const recordType of Object.values(RecordType)) {
-          newVideo.recordType = recordType;
-          await this.videoEntityRepository.insert(newVideo);
+          if (recordType !== RecordType.CASTS) {
+            newVideo.recordType = recordType;
+            await this.videoEntityRepository.insert(newVideo);
+          }
         }
         break;
       case 6:
         for (const recordType of Object.values(RecordType)) {
-          if (recordType !== RecordType.ASSISTS) {
+          if (recordType !== RecordType.ASSISTS && recordType !== RecordType.CASTS) {
             newVideo.recordType = recordType;
             await this.videoEntityRepository.insert(newVideo);
           }
@@ -399,7 +401,7 @@ export class VideoService {
         break;
       case 5:
         for (const recordType of Object.values(RecordType)) {
-          if (recordType !== RecordType.SHORTS) {
+          if (recordType !== RecordType.SHORTS && recordType !== RecordType.CASTS) {
             newVideo.recordType = recordType;
             await this.videoEntityRepository.insert(newVideo);
           }
@@ -407,7 +409,7 @@ export class VideoService {
         break;
       case 4:
         for (const recordType of Object.values(RecordType)) {
-          if (recordType !== RecordType.SHORTSX) {
+          if (recordType !== RecordType.SHORTSX && recordType !== RecordType.CASTS) {
             newVideo.recordType = recordType;
             await this.videoEntityRepository.insert(newVideo);
           }
@@ -431,24 +433,28 @@ export class VideoService {
   async videoUpload(payload: any): Promise<VideoUploadResponse> {
     const { tempId, recordType, contents } = payload;
     const video = await this.videoEntityRepository.findOne({ where: { tempId, recordType } });
+
     video.title = 'title';
     video.sub_title = 'sub_title';
     video.description = 'description';
-    video.url = 'url';
-    video.video_files = ['video_files'];
-    video.meta = ['meta'];
-
-    if (recordType === RecordType.SHORTSX) {
-      video.channelList = ['channelList'];
-    }
-    video.thumbnail = ['thumbnail'];
-    video.duration = 'duration';
-
+    video.video_files = contents;
+    video.meta = this.makeMeta(contents, recordType);
+    video.isStatus = true;
     await this.videoEntityRepository.save(video);
 
     return {
       id: video.id,
       tempId: video.tempId,
     };
+  }
+
+  makeMeta(contents: Array<string>, recordType: string): Array<string> {
+    const meta = [];
+    if (recordType === RecordType.ASSISTS.toLowerCase()) {
+      for (const content of contents) {
+        meta.push(content.replace('mp4', 'json'));
+      }
+    }
+    return meta;
   }
 }
