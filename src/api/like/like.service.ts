@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { LikeEntity } from '@/model/entities/';
-import { Video } from '@entities/index';
+import { Video, VideoEntity } from '@entities/index';
 import { GetLikeCheckRequest, GetLikeCheckResponse, ToggleLikeRequest, ToggleLikeResponse } from '@proto/fdist.pb';
 
 @Injectable()
@@ -11,6 +11,8 @@ export class LikeService {
   private readonly likeRepository: Repository<LikeEntity>;
   @InjectRepository(Video)
   private readonly videoRepository: Repository<Video>;
+  @InjectRepository(VideoEntity)
+  private readonly videoEntityRepository: Repository<VideoEntity>;
 
   public async getLikeCheck(payload: GetLikeCheckRequest): Promise<GetLikeCheckResponse> {
     const tmpLike = await this.likeRepository.findOne({ where: { userId: payload.userId, videoId: payload.videoId } });
@@ -43,9 +45,9 @@ export class LikeService {
     const tmpLike = await this.likeRepository.findOne({ where: { userId: payload.userId, videoId: payload.videoId } });
 
     if (tmpLike) {
-      const video = await this.videoRepository.findOne({ where: { id: payload.videoId } });
-      video.likesCount -= 1;
-      await this.videoRepository.save(video);
+      const video = await this.videoEntityRepository.findOne({ where: { id: payload.videoId } });
+      video.like_count -= 1;
+      await this.videoEntityRepository.save(video);
       await this.likeRepository.delete({
         userId: payload.userId,
         videoId: payload.videoId,
@@ -58,7 +60,7 @@ export class LikeService {
         data: [
           {
             result: false,
-            likeCount: video.likesCount
+            likeCount: video.like_count,
           },
         ],
       };
@@ -67,9 +69,9 @@ export class LikeService {
       like.userId = payload.userId;
       like.videoId = payload.videoId;
       await this.likeRepository.save(like);
-      const video = await this.videoRepository.findOne({ where: { id: payload.videoId } });
-      video.likesCount += 1;
-      await this.videoRepository.save(video);
+      const video = await this.videoEntityRepository.findOne({ where: { id: payload.videoId } });
+      video.like_count += 1;
+      await this.videoEntityRepository.save(video);
 
       return {
         result: 'ok',
@@ -78,7 +80,7 @@ export class LikeService {
         data: [
           {
             result: true,
-            likeCount: video.likesCount,
+            likeCount: video.like_count,
           },
         ],
       };

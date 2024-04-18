@@ -5,6 +5,7 @@ export * from './account/channel-account.entity';
 export * from './account/subscription.entity';
 export * from './account/reset-password.entity';
 export * from './account/user.social.entity';
+export * from './account/firebase.user.token.entity';
 
 // 웹소켓 관련 엔티티
 export * from './websocket/room.entity';
@@ -15,6 +16,10 @@ export * from './websocket/message.websocket.entity';
 // 백오피스
 export * from './backoffice/commonCode-backoffice.entity';
 export * from './backoffice/item-details-backoffice.entity';
+export * from './backoffice/customer-backoffice.entity';
+export * from './backoffice/venue-backoffice.entity';
+export * from './backoffice/sector-venue-backoffice.entity';
+export * from './backoffice/country-backoffice.entity';
 
 // 영상 관련 엔티티
 export * from './video/video.entity';

@@ -28,6 +28,7 @@
       "@dto/*": ["./src/model/dto/*"],
       "@entities/*": ["./src/model/entities/*"],
       "@repositories/*": ["./src/model/repositories/*"],
+      "@view/*": ["src/model/view/*"],
     },
   }
 }

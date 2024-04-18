@@ -1,0 +1,1 @@
+export * from './view-video.entity';

@@ -1,17 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Video, SubCategory } from '@entities/index';
+import { Video, SubCategory, VideoEntity, CommonCode, ItemDetails } from '@entities/index';
 import { GetCategorySubResponse, GetCategoryResponse, GetRecordTypeResponse } from '@proto/fdist.pb';
-import * as dayjs from 'dayjs';
 
 @Injectable()
 export class CategoryService {
-  @InjectRepository(Video)
-  private readonly videoRepository: Repository<Video>;
-
-  @InjectRepository(SubCategory)
-  private readonly subCategoryRepository: Repository<SubCategory>;
+  @InjectRepository(Video)        private readonly videoRepository: Repository<Video>;
+  @InjectRepository(SubCategory)  private readonly subCategoryRepository: Repository<SubCategory>;
+  @InjectRepository(VideoEntity)  private readonly videoEntityRepository: Repository<VideoEntity>;
+  @InjectRepository(CommonCode)   private readonly commonCodeRepository: Repository<CommonCode>;
+  @InjectRepository(ItemDetails)  private readonly itemRepository: Repository<ItemDetails>;
 
   public async getCategory(): Promise<GetCategoryResponse> {
     let num = 0;
@@ -33,49 +32,34 @@ export class CategoryService {
     };
   }
 
-  public async getCategories(): Promise<GetCategorySubResponse> {
+  public async getCategories(payload: any): Promise<GetCategorySubResponse> {
+    let lang = payload.lang;
+    if (lang === '' || lang === undefined) {
+      lang = 'en';
+    }
+
     let num = 1;
-    const categories = await this.subCategoryRepository
-      .createQueryBuilder('sub_category')
-      .select('sort, name')
+    const categories = await this.itemRepository.createQueryBuilder('item_details')
+      .select(`sort, ${lang}`)
       .orderBy('sort', 'ASC')
       .getRawMany();
-    const data = categories.map((category) => {
+    let data1 = [];
+    data1[0] = {
+      index: 0,
+      categorySubName: 'All',
+    };
+    data1[1] = {
+      index: 100,
+      categorySubName: 'My Video',
+    }
+    const data2 = categories.map((category) => {
       return {
         index: num++,
-        categorySubName: category.name,
+        categorySubName: category[`${lang}`],
       };
     });
 
-    data[1].index = 100;
-
-    const date = dayjs('2024-02-25 09:00:00'); //한시적으로 사용
-    if (!date.isBefore(dayjs())) {
-      const data = [
-        {
-          index: 0,
-          categorySubName: 'GOLF',
-        },
-        {
-          index: 1,
-          categorySubName: 'BALLET',
-        },
-        {
-          index: 2,
-          categorySubName: 'DANCE',
-        },
-        {
-          index: 100,
-          categorySubName: 'My Videos',
-        },
-      ];
-      return {
-        result: 'ok',
-        status: 200,
-        message: 'success',
-        data,
-      };
-    }
+    const data = data1.concat(data2);
 
     return {
       result: 'ok',
@@ -84,15 +68,22 @@ export class CategoryService {
       data,
     };
   }
+
   public async getRecordType(): Promise<GetRecordTypeResponse> {
-    const recordTypes = await this.videoRepository.createQueryBuilder('video').select('DISTINCT "recordType"').getRawMany();
-    let num = 0;
-    const data = recordTypes.map((item) => {
-      return {
-        index: num++,
-        recordType: item.recordType,
-      };
-    });
+    const data = [
+      {
+        index: 0,
+        recordType: 'ASSISTS',
+      },
+      {
+        index: 1,
+        recordType: 'SHORTS',
+      },
+      {
+        index: 2,
+        recordType: 'SHORTS+',
+      },
+    ];
 
     return {
       result: 'ok',
