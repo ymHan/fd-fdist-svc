@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ReportEntity, Video, VideoEntity, UserAccountEntity } from '@/model/entities';
+import { ReportEntity, Video, VideoEntity, UserAccountEntity, VenueBackofficeEntity } from '@/model/entities';
 import {
   GetVideoByIdRequest,
   GetVideoListRequest,
@@ -15,8 +15,6 @@ import {
   TogglePublishedRequest,
   TogglePublishedResponse,
   addTmpVideoRequest,
-  VideoUploadRequest,
-  VideoUploadResponse,
 } from '@proto/fdist.pb';
 import { Category, CategorySubEnum, RecordType } from '@enum/index';
 import * as dayjs from 'dayjs';
@@ -24,24 +22,16 @@ import { ViewVideo } from '@/model/view';
 
 @Injectable()
 export class VideoService {
-  @InjectRepository(UserAccountEntity)
-  private readonly userRepository: Repository<UserAccountEntity>;
-
-  @InjectRepository(Video)
-  private readonly videoRepository: Repository<Video>;
-
-  @InjectRepository(ReportEntity)
-  private readonly reportRepository: Repository<ReportEntity>;
-
-  @InjectRepository(VideoEntity)
-  private readonly videoEntityRepository: Repository<VideoEntity>;
-
-  @InjectRepository(ViewVideo)
-  private readonly viewVideoRepository: Repository<ViewVideo>;
+  @InjectRepository(UserAccountEntity) private readonly userRepository: Repository<UserAccountEntity>;
+  @InjectRepository(Video) private readonly videoRepository: Repository<Video>;
+  @InjectRepository(ReportEntity) private readonly reportRepository: Repository<ReportEntity>;
+  @InjectRepository(VideoEntity) private readonly videoEntityRepository: Repository<VideoEntity>;
+  @InjectRepository(ViewVideo) private readonly viewVideoRepository: Repository<ViewVideo>;
+  @InjectRepository(VenueBackofficeEntity) private readonly venueRepository: Repository<VenueBackofficeEntity>;
 
   public async togglePublished(payload: TogglePublishedRequest): Promise<TogglePublishedResponse> {
     const { userId, videoId } = payload;
-    const video = await this.videoEntityRepository.findOne({ where: { id: videoId } });
+    const video = await this.videoRepository.findOne({ where: { email: userId, id: videoId } });
     if (!video) {
       return {
         result: 'fail',
@@ -50,22 +40,22 @@ export class VideoService {
         data: null,
       };
     }
-    video.isPublic = !video.isPublic;
-    const result = await this.videoEntityRepository.save(video);
+    video.isPublished = !video.isPublished;
+    const result = await this.videoRepository.save(video);
 
     return {
       result: 'ok',
       status: 200,
       message: 'success',
       data: {
-        isPublished: result.isPublic,
+        isPublished: result.isPublished,
       },
     };
   }
 
   public async deleteVideo(payload: DeleteVideoRequest): Promise<any> {
     const { userId, videoId } = payload;
-    const video = await this.videoEntityRepository.findOne({ where: { id: videoId, isDeleted: false } });
+    const video = await this.videoRepository.findOne({ where: { email: userId, id: videoId, isDeleted: false } });
 
     if (!video) {
       return {
@@ -77,7 +67,7 @@ export class VideoService {
     }
 
     video.isDeleted = !video.isDeleted;
-    await this.videoEntityRepository.save(video);
+    await this.videoRepository.save(video);
 
     return {
       result: 'ok',
@@ -91,9 +81,9 @@ export class VideoService {
     const userEmail = payload.userEmail;
     const user = await this.userRepository.findOne({ where: { email: userEmail } });
 
-    const QueryBuilder = this.videoEntityRepository.createQueryBuilder('video');
+    const QueryBuilder = this.videoRepository.createQueryBuilder('video');
     const video = QueryBuilder
-      .where('video.user = :user', { user })
+      .where('video.email = :userEmail', { userEmail })
       .andWhere('video.isDeleted = :isDeleted', { isDeleted: false })
       .getOne();
 
@@ -119,7 +109,7 @@ export class VideoService {
     const sort = payload.sort || 'createdAt';
     const order = payload.order || 'desc';
 
-    const queryBuilder = this.viewVideoRepository.createQueryBuilder('video');
+    const queryBuilder = this.videoRepository.createQueryBuilder('video');
 
     const [videos, total] = await queryBuilder
       .where('video.email = :userEmail', { userEmail })
@@ -220,7 +210,7 @@ export class VideoService {
 
     if (!checkMain && !checkSub && !checkRecordType) {
       //const [videos, total] = await this.videoRepository.findAndCount();
-      const queryBuilder = this.viewVideoRepository.createQueryBuilder('video');
+      const queryBuilder = this.videoRepository.createQueryBuilder('video');
       const [videos, total] = await queryBuilder
         .where('video.isPublished = :isPublished', { isPublished: true })
         .andWhere('video.isDeleted = :isDeleted', { isDeleted: false })
@@ -240,7 +230,7 @@ export class VideoService {
     }
 
     if (checkMain) {
-      const queryBuilder = this.viewVideoRepository.createQueryBuilder('video');
+      const queryBuilder = this.videoRepository.createQueryBuilder('video');
       const [videos, total] = await queryBuilder
         .where('video.category = :cat', { cat })
         .andWhere('video.isPublished = :isPublished', { isPublished: true })
@@ -263,7 +253,7 @@ export class VideoService {
     }
 
     if (checkSub) {
-      const queryBuilder = this.viewVideoRepository.createQueryBuilder('video');
+      const queryBuilder = this.videoRepository.createQueryBuilder('video');
       const [videos, total] = await queryBuilder
         .where('video.categorySub = :cat', { cat })
         .andWhere('video.isPublished = :isPublished', { isPublished: true })
@@ -286,7 +276,7 @@ export class VideoService {
     }
 
     if (checkRecordType) {
-      const queryBuilder = this.viewVideoRepository.createQueryBuilder('video');
+      const queryBuilder = this.videoRepository.createQueryBuilder('video');
       const [videos, total] = await queryBuilder
         .where('video.recordType = :cat', { cat })
         .andWhere('video.isPublished = :isPublished', { isPublished: true })
@@ -310,7 +300,7 @@ export class VideoService {
   }
 
   async getVideoById(payload: GetVideoByIdRequest): Promise<any> {
-    const video = await this.videoEntityRepository.findOne({ where: { id: payload.id } });
+    const video = await this.videoRepository.findOne({ where: { id: payload.id } });
 
     if (!video) {
       return {
@@ -320,8 +310,8 @@ export class VideoService {
       };
     }
 
-    video.view_count += 1;
-    await this.videoEntityRepository.save(video);
+    video.viewCount += 1;
+    await this.videoRepository.save(video);
 
     return {
       result: 'ok',
@@ -340,9 +330,9 @@ export class VideoService {
 
     await this.reportRepository.save(report);
 
-    const video = await this.videoEntityRepository.findOne({ where: { id: payload.videoId } });
+    const video = await this.videoRepository.findOne({ where: { id: payload.videoId } });
     video.reportCount += 1;
-    await this.videoEntityRepository.save(video);
+    await this.videoRepository.save(video);
 
     return {
       result: 'ok',
@@ -476,6 +466,16 @@ export class VideoService {
       tempId: video.tempId,
       recordType: video.recordType,
     };
+  }
+
+  async getUrl(nodeId: string) {
+    const sportsId = nodeId.substring(0, 5);
+    const customerId = nodeId.substring(6, 10);
+    const venueId = nodeId.substring(10, 13);
+    const sectorId: string = nodeId.substring(13, 16);
+    const venue = await this.venueRepository.findOne({ where: { id: venueId } });
+
+    return `/${sportsId}/${customerId}/${venueId}/${sectorId}/`;
   }
 
   makeMeta(contents: Array<string>, recordType: string): Array<string> {
