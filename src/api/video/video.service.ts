@@ -112,9 +112,8 @@ export class VideoService {
     const queryBuilder = this.viewVideoRepository.createQueryBuilder('video');
 
     const [videos, total] = await queryBuilder
-      .where('video.email = :userEmail', { userEmail })
-      .andWhere('video.isDeleted = :isDeleted', { isDeleted: false })
-      .andWhere('video.isStatus = :isStatus', { isStatus: true })
+      .where(`video.email = '${userEmail}'`)
+      .andWhere(`video.isDeleted = false`)
       .skip((page - 1) * limit)
       .orderBy(`video.${sort}`, order.toUpperCase() as 'ASC' | 'DESC')
       .take(limit)
