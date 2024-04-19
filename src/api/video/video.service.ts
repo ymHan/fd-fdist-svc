@@ -143,7 +143,7 @@ export class VideoService {
       const queryBuilder = this.viewVideoRepository.createQueryBuilder('video');
       const [videos, total] = await queryBuilder
         .where('video.recordType = :type', { type })
-        .andWhere('video.isPublished = :isPublished', { isPublished: true })
+        .andWhere('video.isPublic = :isPublished', { isPublished: true })
         .getManyAndCount();
 
       return {
