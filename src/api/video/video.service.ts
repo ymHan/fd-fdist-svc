@@ -19,6 +19,9 @@ import {
 import { Category, CategorySubEnum, RecordType } from '@enum/index';
 import * as dayjs from 'dayjs';
 import { ViewVideo } from '@/model/view';
+import * as fs from 'fs';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 @Injectable()
 export class VideoService {
@@ -82,8 +85,7 @@ export class VideoService {
     const user = await this.userRepository.findOne({ where: { email: userEmail } });
 
     const QueryBuilder = this.videoRepository.createQueryBuilder('video');
-    const video = QueryBuilder
-      .where('video.email = :userEmail', { userEmail })
+    const video = QueryBuilder.where('video.email = :userEmail', { userEmail })
       .andWhere('video.isDeleted = :isDeleted', { isDeleted: false })
       .getOne();
 
@@ -380,16 +382,24 @@ export class VideoService {
       recordType: null,
     };
 
-    await this.addTempVideo(id, newVideo);
+    const result = await this.addTempVideo(id, newVideo);
+
+    return {
+      result: 'ok',
+      status: 200,
+      message: 'success',
+      data: result,
+    };
   }
 
   private async addTempVideo(item: number, newVideo: any) {
+    let result;
     switch (item) {
       case 7:
         for (const recordType of Object.values(RecordType)) {
           if (recordType !== RecordType.CASTS) {
             newVideo.recordType = recordType;
-            await this.videoEntityRepository.insert(newVideo);
+            result = await this.videoEntityRepository.insert(newVideo);
           }
         }
         break;
@@ -398,7 +408,7 @@ export class VideoService {
           if (recordType !== RecordType.ASSISTS) {
             if (recordType !== RecordType.CASTS) {
               newVideo.recordType = recordType;
-              await this.videoEntityRepository.insert(newVideo);
+              result = await this.videoEntityRepository.insert(newVideo);
             }
           }
         }
@@ -408,7 +418,7 @@ export class VideoService {
           if (recordType !== RecordType.SHORTS) {
             if (recordType !== RecordType.CASTS) {
               newVideo.recordType = recordType;
-              await this.videoEntityRepository.insert(newVideo);
+              result = await this.videoEntityRepository.insert(newVideo);
             }
           }
         }
@@ -418,30 +428,32 @@ export class VideoService {
           if (recordType !== RecordType.SHORTSX) {
             if (recordType !== RecordType.CASTS) {
               newVideo.recordType = recordType;
-              await this.videoEntityRepository.insert(newVideo);
+              result = await this.videoEntityRepository.insert(newVideo);
             }
           }
         }
         break;
       case 3:
         newVideo.recordType = RecordType.SHORTSX;
-        await this.videoEntityRepository.insert(newVideo);
+        result = await this.videoEntityRepository.insert(newVideo);
         break;
       case 2:
         newVideo.recordType = RecordType.SHORTS;
-        await this.videoEntityRepository.insert(newVideo);
+        result = await this.videoEntityRepository.insert(newVideo);
         break;
       case 1:
         newVideo.recordType = RecordType.ASSISTS;
-        await this.videoEntityRepository.insert(newVideo);
+        result = await this.videoEntityRepository.insert(newVideo);
         break;
     }
+
+    return { result };
   }
 
   async videoUpload(payload: any): Promise<any> {
-    const { tempId, category, recordType, contents } = payload;
+    const { tempId, recordType, contents } = payload;
     const video = await this.videoEntityRepository.findOne({
-      where: { tempId, recordType: recordType.toUpperCase()},
+      where: { tempId, recordType: recordType.toUpperCase() },
       relations: ['user'],
     });
 
@@ -449,11 +461,12 @@ export class VideoService {
     video.sub_title = await this.makeTitles(video.nodeId);
     video.description = await this.makeTitles(video.nodeId);
     video.isStatus = true;
-    video.file_path = this.makeFilePath(video.user.email)
+    video.file_path = this.makeFilePath(video.user.email);
     video.video_files = contents;
-    video.meta = this.makeMeta(contents, recordType);
+    video.meta = await this.makeMeta(contents, recordType);
+    video.url = await this.getUrl(video.nodeId);
 
-    const { duration, thumbnails } = await this.getMetaInfo(video);
+    await this.getMetaInfo(video);
 
     video.duration = this.makeDuration(contents);
     video.thumbnail = this.makeThumbnail(contents, recordType);
@@ -469,16 +482,13 @@ export class VideoService {
   }
 
   async getUrl(nodeId: string) {
-    const sportsId = nodeId.substring(0, 5);
-    const customerId = nodeId.substring(6, 10);
     const venueId = nodeId.substring(10, 13);
-    const sectorId: string = nodeId.substring(13, 16);
     const venue = await this.venueRepository.findOne({ where: { id: venueId } });
 
-    return `/${sportsId}/${customerId}/${venueId}/${sectorId}/`;
+    return venue.url;
   }
 
-  makeMeta(contents: Array<string>, recordType: string): Array<string> {
+  async makeMeta(contents: Array<string>, recordType: string): Promise<Array<string>> {
     const meta = [];
     if (recordType === RecordType.ASSISTS.toLowerCase()) {
       for (const content of contents) {
@@ -508,19 +518,34 @@ export class VideoService {
   }
 
   async makeTitles(nodeId: string): Promise<string> {
-    const sportsId = nodeId.substring(0, 5);
-    const customerId = nodeId.substring(6, 10);
     const venueId = nodeId.substring(10, 13);
-    const sectorId: string = nodeId.substring(13,16);
-
-    return 'Panasonic Open Championship 2024';
+    const venue = await this.venueRepository.findOne({ where: { id: venueId } });
+    return venue.name;
   }
 
   async getMetaInfo(video) {
-
-    return {
-      duration: 'duration',
-      thumbnails: ['thumbnail'],
+    const metaFilePath = `${process.env.ORIGIN_FILE_ROOT}${video.file_path}meta.json`;
+    const payload = {
+      tempId: video.tempId,
+      recordType: video.recordType,
+      metaFilePath,
     };
+    await this.getFileInfo(payload);
+  }
+
+  async getFileInfo(payload) {
+    const { tempId, recordType, metaFilePath } = payload;
+    try {
+      const meta = JSON.parse(fs.readFileSync(metaFilePath, 'utf8'));
+      console.log(meta);
+      const video = await this.videoEntityRepository.findOne({ where: { tempId, recordType } });
+      video.duration = meta.duration;
+      video.thumbnail = meta.thumbnail;
+      video.isStatus = true;
+
+      return await this.videoEntityRepository.save(video);
+    } catch (error) {
+      console.log(error);
+    }
   }
 }

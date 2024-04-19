@@ -1,5 +1,13 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
-import { VenueBackofficeEntity } from './venue-backoffice.entity';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToMany,
+  JoinColumn,
+} from 'typeorm';
+import { VenueBackofficeEntity } from '@/model/entities';
 
 @Entity()
 export class CustomerBackofficeEntity {
@@ -18,6 +26,7 @@ export class CustomerBackofficeEntity {
   @UpdateDateColumn({ name: 'update_at', comment: '수정일', default: () => 'CURRENT_TIMESTAMP' })
   updatedAt: Date;
 
-  @OneToMany(() => VenueBackofficeEntity, (venue) => venue.venue)
+  @OneToMany(() => VenueBackofficeEntity, (venue) => venue.customer)
+  @JoinColumn()
   venues: VenueBackofficeEntity[];
 }

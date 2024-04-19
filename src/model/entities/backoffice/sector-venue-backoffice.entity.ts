@@ -1,12 +1,12 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { VenueBackofficeEntity } from '@entities/backoffice/venue-backoffice.entity';
+import { VenueBackofficeEntity } from '@/model/entities';
 
 @Entity()
 export class SectorVenueBackofficeEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', unique: true, nullable: false, length: 11 })
+  @Column({ type: 'varchar', unique: true, nullable: false, length: 16})
   nodeId: string;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
@@ -20,5 +20,5 @@ export class SectorVenueBackofficeEntity {
 
   @ManyToOne(() => VenueBackofficeEntity, (venue) => venue.sectors)
   @JoinColumn()
-  venues: VenueBackofficeEntity;
+  venue: VenueBackofficeEntity;
 }

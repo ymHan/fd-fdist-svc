@@ -16,7 +16,7 @@ export class VideoEntity {
   @PrimaryGeneratedColumn()
   id: number; // 비디오 아이디
 
-  @Column()
+  @Column({ nullable: true })
   tempId: string; // 비디오 임시 아이디
 
   @Column()

@@ -1,25 +1,24 @@
 import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
-import { CustomerBackofficeEntity } from '@entities/backoffice/customer-backoffice.entity';
-import { SectorVenueBackofficeEntity } from '@entities/backoffice/sector-venue-backoffice.entity';
+import { CustomerBackofficeEntity, SectorVenueBackofficeEntity } from '@/model/entities';
 
 @Entity()
 export class VenueBackofficeEntity {
   @PrimaryColumn({ type: 'varchar', length: 4 })
   id: string;
 
-  @Column()
+  @Column({ nullable: true })
+  sportsCode: string;
+
+  @Column({ nullable: true })
   countryId: number;
 
-  @Column()
-  stateId: number;
-
-  @Column()
-  cityId: number;
-
-  @Column()
+  @Column({ nullable: true })
   name: string;
 
-  @Column()
+  @Column({ nullable: true })
+  url: string;
+
+  @Column({ nullable: true })
   description: string;
 
   @Column({ type: 'bool', nullable: false, default: false })
@@ -34,10 +33,11 @@ export class VenueBackofficeEntity {
   @Column({ type: 'timestamp', nullable: true })
   public deletedAt: Date;
 
-  @ManyToOne(() => CustomerBackofficeEntity, (venue) => venue.venues)
+  @ManyToOne(() => CustomerBackofficeEntity, (customer) => customer.venues)
   @JoinColumn()
-  venue: CustomerBackofficeEntity;
+  customer: CustomerBackofficeEntity;
 
-  @OneToMany(() => SectorVenueBackofficeEntity, (sector) => sector.venues)
+  @OneToMany(() => SectorVenueBackofficeEntity, (sector) => sector.venue)
+  @JoinColumn()
   sectors: SectorVenueBackofficeEntity[];
 }
