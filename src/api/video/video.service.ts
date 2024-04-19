@@ -82,9 +82,7 @@ export class VideoService {
 
   public async myVideoExists(payload: MyVideoExistsRequest): Promise<MyVideoExistsResponse> {
     const userEmail = payload.userEmail;
-    const user = await this.userRepository.findOne({ where: { email: userEmail } });
-
-    const QueryBuilder = this.videoRepository.createQueryBuilder('video');
+    const QueryBuilder = this.viewVideoRepository.createQueryBuilder('video');
     const video = QueryBuilder.where('video.email = :userEmail', { userEmail })
       .andWhere('video.isDeleted = :isDeleted', { isDeleted: false })
       .getOne();
@@ -111,11 +109,12 @@ export class VideoService {
     const sort = payload.sort || 'createdAt';
     const order = payload.order || 'desc';
 
-    const queryBuilder = this.videoRepository.createQueryBuilder('video');
+    const queryBuilder = this.viewVideoRepository.createQueryBuilder('video');
 
     const [videos, total] = await queryBuilder
       .where('video.email = :userEmail', { userEmail })
       .andWhere('video.isDeleted = :isDeleted', { isDeleted: false })
+      .andWhere('video.isStatus = :isStatus', { isStatus: true })
       .skip((page - 1) * limit)
       .orderBy(`video.${sort}`, order.toUpperCase() as 'ASC' | 'DESC')
       .take(limit)
@@ -537,7 +536,43 @@ export class VideoService {
     const { tempId, recordType, metaFilePath } = payload;
     try {
       const meta = JSON.parse(fs.readFileSync(metaFilePath, 'utf8'));
-      console.log(meta);
+
+      switch (recordType) {
+        case RecordType.ASSISTS:
+          let tmpMeta;
+          let metaInfo = {
+            duration: '',
+            thumbnail: [],
+          }
+          metaInfo.thumbnail.push(`${recordType.toLowerCase()}_left_${tempId}.jpg`);
+          metaInfo.thumbnail.push(`${recordType.toLowerCase()}_center_${tempId}.jpg`);
+          metaInfo.thumbnail.push(`${recordType.toLowerCase()}_right_${tempId}.jpg`);
+          console.log(meta)
+          console.log(metaInfo.thumbnail[0]);
+          tmpMeta = this.searchMeta(metaInfo.thumbnail[0], meta);
+          console.log(tmpMeta);
+          metaInfo.duration = tmpMeta.duration;
+
+          break;
+        case RecordType.SHORTS:
+          metaInfo.thumbnail.push(`${recordType.toLowerCase()}_${tempId}.jpg`);
+          tmpMeta = await this.searchMeta(metaInfo.thumbnail[0], meta);
+          metaInfo.duration = tmpMeta.duration;
+          break;
+        case RecordType.SHORTSX:
+          metaInfo.thumbnail.push(`shortsx_${tempId}.jpg`);
+          tmpMeta = await this.searchMeta(metaInfo.thumbnail[0], meta);
+          metaInfo.duration = tmpMeta.duration;
+          break;
+      }
+      const schAssists1 = `${recordType.toLowerCase()}_left_${tempId}.jpg`;
+      const schAssists2 = `${recordType.toLowerCase()}_center_${tempId}.jpg`;
+      const schAssists3 = `${recordType.toLowerCase()}_right_${tempId}.jpg`;
+      const schShorts = `${recordType.toLowerCase()}_${tempId}.jpg`;
+      const schShortsx = `${recordType.toLowerCase()}_${tempId}.jpg`;
+
+      console.log(schAssists1, schAssists2, schAssists3, schShorts, schShortsx);
+
       const video = await this.videoEntityRepository.findOne({ where: { tempId, recordType } });
       video.duration = meta.duration;
       video.thumbnail = meta.thumbnail;
@@ -546,6 +581,14 @@ export class VideoService {
       return await this.videoEntityRepository.save(video);
     } catch (error) {
       console.log(error);
+    }
+  }
+
+  searchMeta(key, arr) {
+    for (let i = 0; i < arr.length; i++) {
+      if (arr[i].name === key) {
+        return arr[i];
+      }
     }
   }
 }

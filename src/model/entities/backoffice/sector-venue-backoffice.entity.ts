@@ -6,7 +6,10 @@ export class SectorVenueBackofficeEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', unique: true, nullable: false, length: 16})
+  @Column({ type: 'varchar', length: 3, nullable: true })
+  sectorId: string;
+
+  @Column({ type: 'varchar', unique: true, nullable: true, length: 20 })
   nodeId: string;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })

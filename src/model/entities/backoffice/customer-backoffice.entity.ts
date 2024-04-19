@@ -14,6 +14,9 @@ export class CustomerBackofficeEntity {
   @PrimaryGeneratedColumn()
   id!: number;
 
+  @Column({ nullable: true, type: 'varchar', length: 4 })
+  customer_id: string;
+
   @Column()
   name: string;
 
