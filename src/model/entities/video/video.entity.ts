@@ -50,7 +50,7 @@ export class VideoEntity {
   channelList: string[]; // 비디오 채널 리스트
 
   @Column('text', { array: true, nullable: true })
-  thumbnailUrl: string[]; // 비디오 썸네일 파일명, 여러개 추출이 가능하다.
+  thumbnail: string[]; // 비디오 썸네일 파일명, 여러개 추출이 가능하다.
 
   @Column({ nullable: true })
   duration: string; // 비디오 길이 3 way인 경우 파일이 3개이지만 길이는 모두 동일하기 때문에 하나만 값을 추출한다.
