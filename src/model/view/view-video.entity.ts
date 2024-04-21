@@ -38,7 +38,7 @@ import { ViewEntity, ViewColumn } from 'typeorm';
 })
 export class ViewVideo {
   @ViewColumn()
-  videoId: number;
+  id: number;
 
   @ViewColumn()
   userId: number;
@@ -68,7 +68,7 @@ export class ViewVideo {
   ownerProfileIconUrl: string;
 
   @ViewColumn()
-  thumbnailurl: string;
+  thumbnailUrl: string;
 
   @ViewColumn()
   viewCount: number;
