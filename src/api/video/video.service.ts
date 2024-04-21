@@ -467,7 +467,7 @@ export class VideoService {
     await this.getMetaInfo(video);
 
     video.duration = this.makeDuration(contents);
-    video.thumbnailUrl = this.makeThumbnail(contents, recordType);
+    video.thumbnail = this.makeThumbnail(contents, recordType);
 
     await this.videoEntityRepository.save(video);
 
@@ -574,7 +574,7 @@ export class VideoService {
 
       const video = await this.videoEntityRepository.findOne({ where: { tempId, recordType } });
       video.duration = meta.duration;
-      video.thumbnailUrl = meta.thumbnail;
+      video.thumbnail = meta.thumbnail;
       video.isStatus = true;
 
       return await this.videoEntityRepository.save(video);
