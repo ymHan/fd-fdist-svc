@@ -535,44 +535,39 @@ export class VideoService {
     const { tempId, recordType, metaFilePath } = payload;
     try {
       const meta = JSON.parse(fs.readFileSync(metaFilePath, 'utf8'));
-
       switch (recordType) {
-        case RecordType.ASSISTS:
-          let tmpMeta;
-          let metaInfo = {
+        case RecordType.ASSISTS: {
+          const metaInfo = {
             duration: '',
             thumbnail: [],
-          }
+          };
           metaInfo.thumbnail.push(`${recordType.toLowerCase()}_left_${tempId}.jpg`);
           metaInfo.thumbnail.push(`${recordType.toLowerCase()}_center_${tempId}.jpg`);
           metaInfo.thumbnail.push(`${recordType.toLowerCase()}_right_${tempId}.jpg`);
-          console.log(meta)
-          console.log(metaInfo.thumbnail[0]);
-          tmpMeta = this.searchMeta(metaInfo.thumbnail[0], meta);
-          console.log(tmpMeta);
-          metaInfo.duration = tmpMeta.duration;
-
+          metaInfo.duration = this.searchMeta(metaInfo.thumbnail[0], meta).toString();
           break;
-        case RecordType.SHORTS:
-          metaInfo.thumbnail.push(`${recordType.toLowerCase()}_${tempId}.jpg`);
-          tmpMeta = await this.searchMeta(metaInfo.thumbnail[0], meta);
-          metaInfo.duration = tmpMeta.duration;
+        }
+        case RecordType.SHORTS: {
+          const metaInfo = {
+            duration: '',
+            thumbnail: [],
+          };
+          metaInfo.thumbnail.push(`${recordType.toLowerCase()}_left_${tempId}.jpg`);
+          metaInfo.duration = this.searchMeta(metaInfo.thumbnail[0], meta).toString();
           break;
-        case RecordType.SHORTSX:
+        }
+        case RecordType.SHORTSX: {
+          const metaInfo = {
+            duration: '',
+            thumbnail: [],
+          };
           metaInfo.thumbnail.push(`shortsx_${tempId}.jpg`);
-          tmpMeta = await this.searchMeta(metaInfo.thumbnail[0], meta);
-          metaInfo.duration = tmpMeta.duration;
+          metaInfo.duration = this.searchMeta(metaInfo.thumbnail[0], meta).toString();
           break;
+        }
       }
-      const schAssists1 = `${recordType.toLowerCase()}_left_${tempId}.jpg`;
-      const schAssists2 = `${recordType.toLowerCase()}_center_${tempId}.jpg`;
-      const schAssists3 = `${recordType.toLowerCase()}_right_${tempId}.jpg`;
-      const schShorts = `${recordType.toLowerCase()}_${tempId}.jpg`;
-      const schShortsx = `${recordType.toLowerCase()}_${tempId}.jpg`;
 
-      console.log(schAssists1, schAssists2, schAssists3, schShorts, schShortsx);
-
-      const video = await this.videoEntityRepository.findOne({ where: { tempId, recordType } });
+      const video = await this.videoEntityRepository.findOne({ where: { tempId, recordType, isStatus: false } });
       video.duration = meta.duration;
       video.thumbnail = meta.thumbnail;
       video.isStatus = true;
@@ -585,8 +580,8 @@ export class VideoService {
 
   searchMeta(key, arr) {
     for (let i = 0; i < arr.length; i++) {
-      if (arr[i].name === key) {
-        return arr[i];
+      if (arr[i].thumb === key) {
+        return arr[i].duration;
       }
     }
   }
