@@ -464,10 +464,10 @@ export class VideoService {
     video.meta = await this.makeMeta(contents, recordType);
     video.url = await this.getUrl(video.nodeId);
 
-    await this.getMetaInfo(video);
+    const rst = await this.getMetaInfo(video);
 
-    video.duration = this.makeDuration(contents);
-    video.thumbnail = this.makeThumbnail(contents, recordType);
+    video.duration = rst.duration;
+    video.thumbnail = rst.thumbnail;
 
     await this.videoEntityRepository.save(video);
 
@@ -528,7 +528,8 @@ export class VideoService {
       recordType: video.recordType,
       metaFilePath,
     };
-    await this.getFileInfo(payload);
+
+    return await this.getFileInfo(payload);
   }
 
   async getFileInfo(payload) {
@@ -537,7 +538,9 @@ export class VideoService {
       const meta = JSON.parse(fs.readFileSync(metaFilePath, 'utf8'));
       switch (recordType) {
         case RecordType.ASSISTS: {
+          const video = await this.videoEntityRepository.findOne({ where: { tempId, recordType, isStatus: false } });
           const metaInfo = {
+            videoId: video.id,
             duration: '',
             thumbnail: [],
           };
@@ -545,34 +548,34 @@ export class VideoService {
           metaInfo.thumbnail.push(`${recordType.toLowerCase()}_center_${tempId}.jpg`);
           metaInfo.thumbnail.push(`${recordType.toLowerCase()}_right_${tempId}.jpg`);
           metaInfo.duration = this.searchMeta(metaInfo.thumbnail[0], meta).toString();
-          break;
+
+          return metaInfo;
         }
         case RecordType.SHORTS: {
+          const video = await this.videoEntityRepository.findOne({ where: { tempId, recordType, isStatus: false } });
           const metaInfo = {
+            videoId: video.id,
             duration: '',
             thumbnail: [],
           };
           metaInfo.thumbnail.push(`${recordType.toLowerCase()}_left_${tempId}.jpg`);
           metaInfo.duration = this.searchMeta(metaInfo.thumbnail[0], meta).toString();
-          break;
+
+          return metaInfo;
         }
         case RecordType.SHORTSX: {
+          const video = await this.videoEntityRepository.findOne({ where: { tempId, recordType, isStatus: false } });
           const metaInfo = {
+            videoId: video.id,
             duration: '',
             thumbnail: [],
           };
           metaInfo.thumbnail.push(`shortsx_${tempId}.jpg`);
           metaInfo.duration = this.searchMeta(metaInfo.thumbnail[0], meta).toString();
-          break;
+
+          return metaInfo;
         }
       }
-
-      const video = await this.videoEntityRepository.findOne({ where: { tempId, recordType, isStatus: false } });
-      video.duration = meta.duration;
-      video.thumbnail = meta.thumbnail;
-      video.isStatus = true;
-
-      return await this.videoEntityRepository.save(video);
     } catch (error) {
       console.log(error);
     }
