@@ -585,7 +585,7 @@ export class VideoService {
       command: 'start',
       data: {
         source_url: `${src_file_path}${video.video_files[0]}`,
-        system_id: '0001',
+        system_id: '0001A',
         codec_preset: {
           input: {
             vcodec: 'H.265',
@@ -647,8 +647,8 @@ export class VideoService {
           deploy: 'oss',
           oss: `kr-4d-4dist`,
         },
-        event_id: video.nodeId,
-        destination_prefix: `${video.file_path}ivod/${video.nodeId}/C${video.id}`,
+        event_id: "0001A",
+        destination_prefix: `${video.file_path}ivod/C${video.id}`,
         return_api: `https://api.4dist.com/v1/video/ivp/${video.id}`,
       },
     };
