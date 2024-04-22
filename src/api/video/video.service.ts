@@ -515,7 +515,7 @@ export class VideoService {
     return venue.name;
   }
 
-  async getMetaInfo(video) {
+  async getMetaInfo(video: VideoEntity) {
     const metaFilePath = `${process.env.ORIGIN_FILE_ROOT}${video.file_path}meta.json`;
     const channelFilePath = `${process.env.ORIGIN_FILE_ROOT}${video.file_path.replace('video', 'json')}shortsx_${
       video.tempId
@@ -542,8 +542,12 @@ export class VideoService {
             thumbnail: [],
             channelList: [],
           };
+          metaInfo.thumbnail.push(`assists_left_${tempId}.jpg`);
           metaInfo.thumbnail.push(`assists_center_${tempId}.jpg`);
+          metaInfo.thumbnail.push(`assists_right_${tempId}.jpg`);
           metaInfo.duration = this.searchMeta(metaInfo.thumbnail[0], meta).toString();
+          metaInfo.duration = this.searchMeta(metaInfo.thumbnail[1], meta).toString();
+          metaInfo.duration = this.searchMeta(metaInfo.thumbnail[2], meta).toString();
 
           return metaInfo;
         }
