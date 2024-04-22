@@ -12,7 +12,7 @@ import { ViewEntity, ViewColumn } from 'typeorm';
              uae.nickname AS ownerNickName,
              cae."channelName" AS ownerChannelName,
              concat(ve.url, upae.photo) AS ownerProfileIconUrl,
-             make_urls(ve.id, 'thumb'::bpchar) AS thumbnailUrl,
+             concat(ve.url, ve.file_path, ve.thumbnail[1]) AS thumbnailUrl,
              ve.view_count AS viewCount,
              ve."reportCount" as reportCount,
              ve.like_count AS likesCount,
