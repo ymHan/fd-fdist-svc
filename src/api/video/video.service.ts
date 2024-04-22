@@ -463,6 +463,8 @@ export class VideoService {
     video.meta = await this.makeMeta(contents, recordType);
     video.url = await this.getUrl(video.nodeId);
 
+    await this.videoEntityRepository.save(video);
+
     const rst = await this.getMetaInfo(video);
 
     video.duration = rst.duration;
@@ -474,6 +476,7 @@ export class VideoService {
     }
 
     video.isStatus = true;
+
     await this.videoEntityRepository.save(video);
 
     return {
@@ -514,12 +517,14 @@ export class VideoService {
 
   async getMetaInfo(video) {
     const metaFilePath = `${process.env.ORIGIN_FILE_ROOT}${video.file_path}meta.json`;
-    const channelFilePath = `${process.env.ORIGIN_FILE_ROOT}${video.file_path.replace('video', 'json')}shortsx_${video.tempId}.json`;
+    const channelFilePath = `${process.env.ORIGIN_FILE_ROOT}${video.file_path.replace('video', 'json')}shortsx_${
+      video.tempId
+    }.json`;
     const payload = {
       tempId: video.tempId,
       recordType: video.recordType,
       metaFilePath,
-      channelFilePath
+      channelFilePath,
     };
 
     return await this.getFileInfo(payload);
@@ -657,13 +662,13 @@ export class VideoService {
             bucket: 'kr-4d-4dist',
           },
         },
-        event_id: "0001A0001",
+        event_id: '0001A0001',
         destination_prefix: `${video.file_path}ivod/C${video.id}`,
         return_api: `https://api.4dist.com/v1/video/ivp/${video.id}`,
       },
     };
 
-    console.log(req_data)
+    console.log(req_data);
     const ivp_msg = await this.axios_notify_to_mlmp(`${IVP_PATH}/post`, req_data);
 
     console.log('ivp_msg', ivp_msg);
