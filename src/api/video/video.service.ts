@@ -182,7 +182,7 @@ export class VideoService {
 
   //전체 영상을 뿌리는 역할을 한다.
   public async getVideos(payload: GetVideoListRequest): Promise<any> {
-    const cat = payload.cat || 'all';
+    const cat = payload.cat.toUpperCase() || 'all';
     const page = payload.page || 1;
     const limit = payload.limit || 10;
 
