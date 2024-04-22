@@ -17,6 +17,7 @@ import {
   addTmpVideoRequest,
 } from '@proto/fdist.pb';
 import { Category, CategorySubEnum, RecordType } from '@enum/index';
+import axios from 'axios';
 import * as dayjs from 'dayjs';
 import { ViewVideo } from '@/model/view';
 import * as fs from 'fs';
@@ -179,6 +180,7 @@ export class VideoService {
     }
   }
 
+  //전체 영상을 뿌리는 역할을 한다.
   public async getVideos(payload: GetVideoListRequest): Promise<any> {
     const cat = payload.cat || 'all';
     const page = payload.page || 1;
@@ -209,7 +211,6 @@ export class VideoService {
     });
 
     if (!checkMain && !checkSub && !checkRecordType) {
-      //const [videos, total] = await this.videoRepository.findAndCount();
       const queryBuilder = this.videoRepository.createQueryBuilder('video');
       const [videos, total] = await queryBuilder
         .where('video.isPublished = :isPublished', { isPublished: true })
@@ -330,9 +331,9 @@ export class VideoService {
 
     await this.reportRepository.save(report);
 
-    const video = await this.videoRepository.findOne({ where: { id: payload.videoId } });
+    const video = await this.videoEntityRepository.findOne({ where: { id: payload.videoId } });
     video.reportCount += 1;
-    await this.videoRepository.save(video);
+    await this.videoEntityRepository.save(video);
 
     return {
       result: 'ok',
@@ -469,6 +470,10 @@ export class VideoService {
     video.duration = rst.duration;
     video.thumbnail = rst.thumbnail;
 
+    if (recordType === RecordType.SHORTSX) {
+      this.makeIVP(video);
+    }
+
     await this.videoEntityRepository.save(video);
 
     return {
@@ -499,20 +504,6 @@ export class VideoService {
   makeFilePath(userEmail: string): string {
     const Dates = dayjs(new Date()).format('YYYYMMDD');
     return `/${userEmail}/${Dates}/video/`;
-  }
-
-  makeThumbnail(contents: Array<string>, recordType: string): Array<string> {
-    const thumbnail = [];
-    if (recordType === RecordType.ASSISTS.toLowerCase()) {
-      for (const content of contents) {
-        thumbnail.push(content.replace('mp4', 'jpg'));
-      }
-    }
-    return thumbnail;
-  }
-
-  makeDuration(contents: Array<string>): string {
-    return 'duration';
   }
 
   async makeTitles(nodeId: string): Promise<string> {
@@ -588,4 +579,115 @@ export class VideoService {
       }
     }
   }
+
+  async makeIVP(video) {
+    const IVP_PATH = `${process.env.IVP_PATH}`;
+    const src_file_path = `oss://kr-4d-4dist${video.file_path}`;
+
+    const data = {
+      command: 'start',
+      data: {
+        source_url: `${src_file_path}${video.video_files[0]}`,
+        system_id: '0001',
+        codec_preset: {
+          input: {
+            vcodec: 'H.265',
+            channel_count: 32,
+            path: '',
+          },
+          adaptive: [
+            {
+              vcodec: 'H.265',
+              width: 1920,
+              fps: 29.97,
+              gop: 30,
+              bitrate: 2000,
+              height: 1080,
+            },
+            {
+              vcodec: 'H.265',
+              width: 1280,
+              fps: 29.97,
+              gop: 30,
+              bitrate: 1000,
+              height: 720,
+            },
+            {
+              vcodec: 'H.265',
+              width: 854,
+              fps: 29.97,
+              gop: 30,
+              bitrate: 350,
+              height: 480,
+            },
+            {
+              vcodec: 'H.265',
+              width: 1920,
+              fps: 29.97,
+              gop: 1,
+              bitrate: 12000,
+              height: 1080,
+            },
+            {
+              vcodec: 'H.265',
+              width: 1280,
+              fps: 29.97,
+              gop: 1,
+              bitrate: 6000,
+              height: 720,
+            },
+            {
+              vcodec: 'H.265',
+              width: 854,
+              fps: 29.97,
+              gop: 1,
+              bitrate: 2100,
+              height: 480,
+            },
+          ],
+        },
+        deploy_info: {
+          deploy: 'oss',
+          oss: `kr-4d-4dist`,
+        },
+        event_id: video.nodeId,
+        destination_prefix: `${src_file_path}/ivod/${video.nodeId}/C${video.id}`,
+        return_api: `https://api.4dist.com/v1/video/ivp/${video.id}`,
+      },
+    };
+
+    const ivp_msg = await this.axios_notify_to_mlmp(`${IVP_PATH}/post`, data);
+
+    if (ivp_msg === 'ok') {
+      console.log('IVP Success');
+    }
+    console.log(ivp_msg);
+  }
+
+  private axios_notify_to_mlmp(url, data) {
+    return new Promise((resolve, reject) => {
+      axios
+        .post(url, data)
+        .then((response) => {
+          resolve(response.data);
+        })
+        .catch((error) => {
+          reject(error);
+        });
+    });
+  }
+
+  public async ivpVideo(id: number): Promise<any> {
+    const video = await this.videoEntityRepository.findOne({ where: { id } });
+    video.isStatus = true;
+    console.log(video);
+    //await this.videoEntityRepository.save(video);
+
+    return {
+      result: 'ok',
+      status: 200,
+      message: 'success',
+    };
+  }
 }
+
