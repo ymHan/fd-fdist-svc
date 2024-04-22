@@ -542,7 +542,7 @@ export class VideoService {
             thumbnail: [],
             channelList: [],
           };
-          metaInfo.thumbnail.push(`assists_mixed_${tempId}.jpg`);
+          metaInfo.thumbnail.push(`assists_center_${tempId}.jpg`);
           metaInfo.duration = this.searchMeta(metaInfo.thumbnail[0], meta).toString();
 
           return metaInfo;
