@@ -459,7 +459,6 @@ export class VideoService {
     video.title = await this.makeTitles(video.nodeId);
     video.sub_title = await this.makeTitles(video.nodeId);
     video.description = await this.makeTitles(video.nodeId);
-    video.isStatus = true;
     video.file_path = this.makeFilePath(video.user.email);
     video.video_files = contents;
     video.meta = await this.makeMeta(contents, recordType);
@@ -471,10 +470,11 @@ export class VideoService {
     video.thumbnail = rst.thumbnail;
 
     console.log(payload);
-    if (recordType === RecordType.SHORTSX) {
+    if (recordType === RecordType.SHORTSX.toLowerCase()) {
       this.makeIVP(video);
     }
 
+    video.isStatus = true;
     await this.videoEntityRepository.save(video);
 
     return {
@@ -557,6 +557,7 @@ export class VideoService {
         }
         case RecordType.SHORTSX: {
           const video = await this.videoEntityRepository.findOne({ where: { tempId, recordType, isStatus: false } });
+
           const metaInfo = {
             videoId: video.id,
             duration: '',
@@ -582,6 +583,7 @@ export class VideoService {
   }
 
   async makeIVP(video) {
+    console.log('makeIVP', video);
     const IVP_PATH = `${process.env.IVP_PATH}`;
     const src_file_path = `oss://kr-4d-4dist${video.file_path}`;
 
@@ -657,10 +659,8 @@ export class VideoService {
       },
     };
 
-    console.log(req_data);
     const ivp_msg = await this.axios_notify_to_mlmp(`${IVP_PATH}/post`, req_data);
-
-    console.log(ivp_msg);
+    console.log('ivp_msg', ivp_msg);
   }
 
   private axios_notify_to_mlmp(url, data) {
@@ -689,5 +689,3 @@ export class VideoService {
     };
   }
 }
-
-[{"thumb":"shortsx_0e609e70-31b5-4d8d-8145-e59ee41bf4d5.jpg","duration":7.007}]
