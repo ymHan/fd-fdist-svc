@@ -470,6 +470,7 @@ export class VideoService {
     video.duration = rst.duration;
     video.thumbnail = rst.thumbnail;
 
+    console.log(payload);
     if (recordType === RecordType.SHORTSX) {
       this.makeIVP(video);
     }
@@ -584,7 +585,7 @@ export class VideoService {
     const IVP_PATH = `${process.env.IVP_PATH}`;
     const src_file_path = `oss://kr-4d-4dist${video.file_path}`;
 
-    const data = {
+    const req_data = {
       command: 'start',
       data: {
         source_url: `${src_file_path}${video.video_files[0]}`,
@@ -651,16 +652,14 @@ export class VideoService {
           oss: `kr-4d-4dist`,
         },
         event_id: video.nodeId,
-        destination_prefix: `${src_file_path}/ivod/${video.nodeId}/C${video.id}`,
+        destination_prefix: `${video.file_path}/ivod/${video.nodeId}/C${video.id}`,
         return_api: `https://api.4dist.com/v1/video/ivp/${video.id}`,
       },
     };
 
-    const ivp_msg = await this.axios_notify_to_mlmp(`${IVP_PATH}/post`, data);
+    console.log(req_data);
+    const ivp_msg = await this.axios_notify_to_mlmp(`${IVP_PATH}/post`, req_data);
 
-    if (ivp_msg === 'ok') {
-      console.log('IVP Success');
-    }
     console.log(ivp_msg);
   }
 
@@ -691,3 +690,4 @@ export class VideoService {
   }
 }
 
+[{"thumb":"shortsx_0e609e70-31b5-4d8d-8145-e59ee41bf4d5.jpg","duration":7.007}]
