@@ -5,7 +5,7 @@ export class UserProfileAccountEntity extends BaseEntity {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column()
+  @Column({ nullable: true })
   gender!: string;
 
   @Column({ type: 'varchar', name: 'photo', nullable: true, length: 255 })
