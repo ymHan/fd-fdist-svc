@@ -301,7 +301,7 @@ export class VideoService {
   }
 
   async getVideoById(payload: GetVideoByIdRequest): Promise<any> {
-    const video = await this.viewVideoRepository.findOne({ where: { id: payload.id } });
+    const video = await this.videoEntityRepository.findOne({ where: { id: payload.id } });
 
     if (!video) {
       return {
@@ -311,8 +311,8 @@ export class VideoService {
       };
     }
 
-    video.viewCount += 1;
-    await this.viewVideoRepository.save(video);
+    video.view_count += 1;
+    await this.videoEntityRepository.save(video);
 
     return {
       result: 'ok',
@@ -468,8 +468,8 @@ export class VideoService {
 
     video.duration = rst.duration;
     video.thumbnail = rst.thumbnail;
+    video.channelList = rst.channelList;
 
-    console.log(payload);
     if (recordType === RecordType.SHORTSX.toLowerCase()) {
       this.makeIVP(video);
     }
@@ -515,25 +515,28 @@ export class VideoService {
 
   async getMetaInfo(video) {
     const metaFilePath = `${process.env.ORIGIN_FILE_ROOT}${video.file_path}meta.json`;
+    const channelFilePath = `${process.env.ORIGIN_FILE_ROOT}${video.file_path.replace('video', 'json')}shortsx_${video.tempId}.json`;
     const payload = {
       tempId: video.tempId,
       recordType: video.recordType,
       metaFilePath,
+      channelFilePath
     };
 
     return await this.getFileInfo(payload);
   }
 
   async getFileInfo(payload) {
-    const { tempId, recordType, metaFilePath } = payload;
+    const { tempId, recordType, metaFilePath, channelFilePath } = payload;
     try {
       const meta = JSON.parse(fs.readFileSync(metaFilePath, 'utf8'));
-      console.log("payload", payload);
+
       switch (recordType) {
         case RecordType.ASSISTS: {
           const metaInfo = {
             duration: '',
             thumbnail: [],
+            channelList: [],
           };
           metaInfo.thumbnail.push(`${recordType.toLowerCase()}_left_${tempId}.jpg`);
           metaInfo.thumbnail.push(`${recordType.toLowerCase()}_center_${tempId}.jpg`);
@@ -546,6 +549,7 @@ export class VideoService {
           const metaInfo = {
             duration: '',
             thumbnail: [],
+            channelList: [],
           };
           metaInfo.thumbnail.push(`${recordType.toLowerCase()}_left_${tempId}.jpg`);
           metaInfo.duration = this.searchMeta(metaInfo.thumbnail[0], meta).toString();
@@ -556,16 +560,22 @@ export class VideoService {
           const metaInfo = {
             duration: '',
             thumbnail: [],
+            channelList: [],
           };
           metaInfo.thumbnail.push(`shortsx_${tempId}.jpg`);
           metaInfo.duration = this.searchMeta(metaInfo.thumbnail[0], meta).toString();
-
+          metaInfo.channelList = this.getChannel(channelFilePath);
           return metaInfo;
         }
       }
     } catch (error) {
       console.log(error);
     }
+  }
+
+  getChannel(filePath) {
+    const channel = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    return channel.param.channel_list;
   }
 
   searchMeta(key, arr) {
