@@ -653,9 +653,6 @@ export class VideoService {
       },
     };
 
-    console.log('req_data', req_data);
-    console.log('IVP_PATH', IVP_PATH);
-
     const ivp_msg = await this.axios_notify_to_mlmp(`${IVP_PATH}/post`, req_data);
 
     console.log('ivp_msg', ivp_msg);
