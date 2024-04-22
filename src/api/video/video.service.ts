@@ -254,11 +254,11 @@ export class VideoService {
     }
 
     if (checkSub) {
-      const queryBuilder = this.viewVideoRepository.createQueryBuilder('video');
+      const queryBuilder = this.viewVideoRepository.createQueryBuilder('vv');
       const [videos, total] = await queryBuilder
-        .where('video.categorySub = :cat', { cat: cat.toUpperCase() })
-        .andWhere('video.isPublished = :isPublished', { isPublished: true })
-        .andWhere('video.isDeleted = :isDeleted', { isDeleted: false })
+        .where('vv.categorySub = :cat', { cat: cat.toUpperCase() })
+        .andWhere('vv.isPublic = :isPublished', { isPublished: true })
+        .andWhere('vv.isDeleted = :isDeleted', { isDeleted: false })
         .skip((page - 1) * limit)
         .take(limit)
         .getManyAndCount();
@@ -277,11 +277,11 @@ export class VideoService {
     }
 
     if (checkRecordType) {
-      const queryBuilder = this.videoRepository.createQueryBuilder('video');
+      const queryBuilder = this.videoRepository.createQueryBuilder('vv');
       const [videos, total] = await queryBuilder
-        .where('video.recordType = :cat', { cat })
-        .andWhere('video.isPublished = :isPublished', { isPublished: true })
-        .andWhere('video.isDeleted = :isDeleted', { isDeleted: false })
+        .where('vv.recordType = :cat', { cat })
+        .andWhere('vv.isPublic = :isPublished', { isPublished: true })
+        .andWhere('vv.isDeleted = :isDeleted', { isDeleted: false })
         .skip((page - 1) * limit)
         .take(limit)
         .getManyAndCount();
@@ -301,7 +301,7 @@ export class VideoService {
   }
 
   async getVideoById(payload: GetVideoByIdRequest): Promise<any> {
-    const video = await this.videoRepository.findOne({ where: { id: payload.id } });
+    const video = await this.viewVideoRepository.findOne({ where: { id: payload.id } });
 
     if (!video) {
       return {
@@ -312,7 +312,7 @@ export class VideoService {
     }
 
     video.viewCount += 1;
-    await this.videoRepository.save(video);
+    await this.viewVideoRepository.save(video);
 
     return {
       result: 'ok',
@@ -645,7 +645,10 @@ export class VideoService {
         },
         deploy_info: {
           deploy: 'oss',
-          oss: `kr-4d-4dist`,
+          oss: {
+            endpoint_url: 'oss-ap-northeast-2.aliyuncs.com',
+            bucket: 'kr-4d-4dist',
+          },
         },
         event_id: "0001A0001",
         destination_prefix: `${video.file_path}ivod/C${video.id}`,
