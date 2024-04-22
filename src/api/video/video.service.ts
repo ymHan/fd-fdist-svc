@@ -211,10 +211,10 @@ export class VideoService {
     });
 
     if (!checkMain && !checkSub && !checkRecordType) {
-      const queryBuilder = this.videoRepository.createQueryBuilder('video');
+      const queryBuilder = this.viewVideoRepository.createQueryBuilder('vv');
       const [videos, total] = await queryBuilder
-        .where('video.isPublished = :isPublished', { isPublished: true })
-        .andWhere('video.isDeleted = :isDeleted', { isDeleted: false })
+        .where('vv.isPublic = :isPublished', { isPublished: true })
+        .andWhere('vv.isDeleted = :isDeleted', { isDeleted: false })
         .getManyAndCount();
 
       return {
@@ -231,11 +231,11 @@ export class VideoService {
     }
 
     if (checkMain) {
-      const queryBuilder = this.videoRepository.createQueryBuilder('video');
+      const queryBuilder = this.viewVideoRepository.createQueryBuilder('vv');
       const [videos, total] = await queryBuilder
-        .where('video.category = :cat', { cat })
-        .andWhere('video.isPublished = :isPublished', { isPublished: true })
-        .andWhere('video.isDeleted = :isDeleted', { isDeleted: false })
+        .where('vv.category = :cat', { cat: cat.toUpperCase() })
+        .andWhere('vv.isPublic = :isPublished', { isPublished: true })
+        .andWhere('vv.isDeleted = :isDeleted', { isDeleted: false })
         .skip((page - 1) * limit)
         .take(limit)
         .getManyAndCount();
@@ -254,9 +254,9 @@ export class VideoService {
     }
 
     if (checkSub) {
-      const queryBuilder = this.videoRepository.createQueryBuilder('video');
+      const queryBuilder = this.viewVideoRepository.createQueryBuilder('video');
       const [videos, total] = await queryBuilder
-        .where('video.categorySub = :cat', { cat })
+        .where('video.categorySub = :cat', { cat: cat.toUpperCase() })
         .andWhere('video.isPublished = :isPublished', { isPublished: true })
         .andWhere('video.isDeleted = :isDeleted', { isDeleted: false })
         .skip((page - 1) * limit)
@@ -647,12 +647,13 @@ export class VideoService {
           deploy: 'oss',
           oss: `kr-4d-4dist`,
         },
-        event_id: "0001A",
+        event_id: "0001A0001",
         destination_prefix: `${video.file_path}ivod/C${video.id}`,
         return_api: `https://api.4dist.com/v1/video/ivp/${video.id}`,
       },
     };
 
+    console.log(req_data)
     const ivp_msg = await this.axios_notify_to_mlmp(`${IVP_PATH}/post`, req_data);
 
     console.log('ivp_msg', ivp_msg);
