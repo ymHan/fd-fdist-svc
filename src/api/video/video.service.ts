@@ -558,7 +558,7 @@ export class VideoService {
         }
         case RecordType.SHORTSX: {
           const video = await this.videoEntityRepository.findOne({ where: { tempId, recordType, isStatus: false } });
-
+          console.log("video", video);
           const metaInfo = {
             videoId: video.id,
             duration: '',
