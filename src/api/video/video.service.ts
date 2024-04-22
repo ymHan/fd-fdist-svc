@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ReportEntity, Video, VideoEntity, UserAccountEntity, VenueBackofficeEntity } from '@/model/entities';
+import { ReportEntity, VideoEntity, UserAccountEntity, VenueBackofficeEntity } from '@/model/entities';
 import {
   GetVideoByIdRequest,
   GetVideoListRequest,
@@ -27,15 +27,14 @@ dotenv.config();
 @Injectable()
 export class VideoService {
   @InjectRepository(UserAccountEntity) private readonly userRepository: Repository<UserAccountEntity>;
-  @InjectRepository(Video) private readonly videoRepository: Repository<Video>;
   @InjectRepository(ReportEntity) private readonly reportRepository: Repository<ReportEntity>;
   @InjectRepository(VideoEntity) private readonly videoEntityRepository: Repository<VideoEntity>;
   @InjectRepository(ViewVideo) private readonly viewVideoRepository: Repository<ViewVideo>;
   @InjectRepository(VenueBackofficeEntity) private readonly venueRepository: Repository<VenueBackofficeEntity>;
 
   public async togglePublished(payload: TogglePublishedRequest): Promise<TogglePublishedResponse> {
-    const { userId, videoId } = payload;
-    const video = await this.videoRepository.findOne({ where: { email: userId, id: videoId } });
+    const { videoId } = payload;
+    const video = await this.videoEntityRepository.findOne({ where: { id: videoId } });
     if (!video) {
       return {
         result: 'fail',
@@ -44,22 +43,22 @@ export class VideoService {
         data: null,
       };
     }
-    video.isPublished = !video.isPublished;
-    const result = await this.videoRepository.save(video);
+    video.isPublic = !video.isPublic;
+    const result = await this.videoEntityRepository.save(video);
 
     return {
       result: 'ok',
       status: 200,
       message: 'success',
       data: {
-        isPublished: result.isPublished,
+        isPublished: result.isPublic,
       },
     };
   }
 
   public async deleteVideo(payload: DeleteVideoRequest): Promise<any> {
-    const { userId, videoId } = payload;
-    const video = await this.videoRepository.findOne({ where: { email: userId, id: videoId, isDeleted: false } });
+    const { videoId } = payload;
+    const video = await this.videoEntityRepository.findOne({ where: { id: videoId, isDeleted: false } });
 
     if (!video) {
       return {
@@ -71,7 +70,7 @@ export class VideoService {
     }
 
     video.isDeleted = !video.isDeleted;
-    await this.videoRepository.save(video);
+    await this.videoEntityRepository.save(video);
 
     return {
       result: 'ok',
@@ -277,7 +276,7 @@ export class VideoService {
     }
 
     if (checkRecordType) {
-      const queryBuilder = this.videoRepository.createQueryBuilder('vv');
+      const queryBuilder = this.viewVideoRepository.createQueryBuilder('vv');
       const [videos, total] = await queryBuilder
         .where('vv.recordType = :cat', { cat })
         .andWhere('vv.isPublic = :isPublished', { isPublished: true })
