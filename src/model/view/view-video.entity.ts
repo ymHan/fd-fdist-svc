@@ -18,7 +18,7 @@ import { ViewEntity, ViewColumn } from 'typeorm';
              ve.like_count AS likesCount,
              ve.duration as duration,
              get_categorysub_name(ve.category) AS category,
-             get_categorysub_name(ve."categorySub") AS "categorySub",
+             get_categorysub_global_name(ve."categorySub", 'en') AS "categorySub",
              ve."categorySubCode" as categorySubCode,
              ve."recordType" as recordType,
              make_urls(ve.id, 'file'::bpchar) AS "contentUrlList",
@@ -35,6 +35,7 @@ import { ViewEntity, ViewColumn } from 'typeorm';
                LEFT OUTER JOIN channel_account_entity cae ON cae.id = uae."channelId"
       WHERE ve."isStatus" = true
   `,
+  synchronize: true,
 })
 export class ViewVideo {
   @ViewColumn()
