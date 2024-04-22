@@ -654,12 +654,16 @@ export class VideoService {
           oss: `kr-4d-4dist`,
         },
         event_id: video.nodeId,
-        destination_prefix: `${video.file_path}/ivod/${video.nodeId}/C${video.id}`,
+        destination_prefix: `${video.file_path}ivod/${video.nodeId}/C${video.id}`,
         return_api: `https://api.4dist.com/v1/video/ivp/${video.id}`,
       },
     };
 
+    console.log('req_data', req_data);
+    console.log('IVP_PATH', IVP_PATH);
+
     const ivp_msg = await this.axios_notify_to_mlmp(`${IVP_PATH}/post`, req_data);
+
     console.log('ivp_msg', ivp_msg);
   }
 
