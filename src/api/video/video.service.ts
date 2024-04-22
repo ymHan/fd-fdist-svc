@@ -528,6 +528,7 @@ export class VideoService {
     const { tempId, recordType, metaFilePath } = payload;
     try {
       const meta = JSON.parse(fs.readFileSync(metaFilePath, 'utf8'));
+      console.log("payload", payload);
       switch (recordType) {
         case RecordType.ASSISTS: {
           const video = await this.videoEntityRepository.findOne({ where: { tempId, recordType, isStatus: false } });
