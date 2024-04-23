@@ -512,7 +512,7 @@ export class VideoService {
       case RecordType.SHORTS.toLowerCase(): {
         return [`shorts_${tempId}.mp4`];
       }
-      case RecordType.SHORTSX.toUpperCase(): {
+      case RecordType.SHORTSX.toLowerCase(): {
         return [`shortsx_${tempId}.mp4`];
       }
     }
@@ -526,7 +526,7 @@ export class VideoService {
       case RecordType.SHORTS.toLowerCase(): {
         return [`shorts_${tempId}.jpg`];
       }
-      case RecordType.SHORTSX.toUpperCase(): {
+      case RecordType.SHORTSX.toLowerCase(): {
         return [`shortsx_${tempId}.jpg`];
       }
     }
@@ -547,7 +547,7 @@ export class VideoService {
       case RecordType.SHORTS.toLowerCase(): {
         return [];
       }
-      case RecordType.SHORTSX.toUpperCase(): {
+      case RecordType.SHORTSX.toLowerCase(): {
         return [];
       }
     }
@@ -558,7 +558,7 @@ export class VideoService {
     return `/${userEmail}/${Dates}/video/`;
   }
 
-  async makeTitles(nodeId: string, recordType: string): Promise<string> {
+  async makeTitles(nodeId: any, recordType: string): Promise<string> {
     const venueId = nodeId.substring(10, 13);
     const venue = await this.venueRepository.findOne({ where: { id: venueId } });
     return `${venue.name} - ${recordType}`;
