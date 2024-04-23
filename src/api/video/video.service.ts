@@ -545,9 +545,9 @@ export class VideoService {
           metaInfo.thumbnail.push(`assists_left_${tempId}.jpg`);
           metaInfo.thumbnail.push(`assists_center_${tempId}.jpg`);
           metaInfo.thumbnail.push(`assists_right_${tempId}.jpg`);
-          metaInfo.duration = this.searchMeta(metaInfo.thumbnail[0], meta).toString();
-          metaInfo.duration = this.searchMeta(metaInfo.thumbnail[1], meta).toString();
-          metaInfo.duration = this.searchMeta(metaInfo.thumbnail[2], meta).toString();
+          metaInfo.duration = await this.searchMeta(metaInfo.thumbnail[0], meta).toString();
+          metaInfo.duration = await this.searchMeta(metaInfo.thumbnail[1], meta).toString();
+          metaInfo.duration = await this.searchMeta(metaInfo.thumbnail[2], meta).toString();
 
           return metaInfo;
         }
@@ -592,8 +592,7 @@ export class VideoService {
     }
   }
 
-  async makeIVP(video) {
-    console.log('makeIVP', video);
+  async makeIVP(video: VideoEntity) {
     const IVP_PATH = `${process.env.IVP_PATH}`;
     const src_file_path = `oss://kr-4d-4dist${video.file_path}`;
 
@@ -605,7 +604,7 @@ export class VideoService {
         codec_preset: {
           input: {
             vcodec: 'H.265',
-            channel_count: 32,
+            channel_count: video.channelList.length,
             path: '',
           },
           adaptive: [
@@ -672,13 +671,12 @@ export class VideoService {
       },
     };
 
-    console.log(req_data);
     const ivp_msg = await this.axios_notify_to_mlmp(`${IVP_PATH}/post`, req_data);
 
     console.log('ivp_msg', ivp_msg);
   }
 
-  private axios_notify_to_mlmp(url, data) {
+  private axios_notify_to_mlmp(url: string, data) {
     return new Promise((resolve, reject) => {
       axios
         .post(url, data)
@@ -694,7 +692,7 @@ export class VideoService {
   public async ivpVideo(id: number): Promise<any> {
     const video = await this.videoEntityRepository.findOne({ where: { id } });
     video.isStatus = true;
-    console.log(video);
+
     //await this.videoEntityRepository.save(video);
 
     return {
