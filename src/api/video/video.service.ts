@@ -449,15 +449,17 @@ export class VideoService {
   }
 
   async videoDone(payload: any): Promise<any> {
-    const { tempId, recordType } = payload;
+    const { tempId, recordType, duration, thumbnail } = payload;
     const video = await this.videoEntityRepository.findOne({
       where: { tempId, recordType: recordType.toUpperCase() },
       relations: ['user'],
     });
+    video.duration = duration;
+    video.thumbnail = thumbnail;
     video.isStatus = true;
     await this.videoEntityRepository.save(video);
 
-    if (recordType === RecordType.SHORTSX) {
+    if (recordType.toUpperCase() === RecordType.SHORTSX) {
       video.channelList = await this.getMetaInfo(video);
       console.log(video);
       await this.makeIVP(video, video.channelList.length);
