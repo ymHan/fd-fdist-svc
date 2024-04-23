@@ -457,8 +457,12 @@ export class VideoService {
     video.duration = duration;
     video.thumbnail = thumbnail;
     video.isStatus = true;
-    const res = await this.videoEntityRepository.save(video);
 
+    const res = await this.videoEntityRepository.save(video);
+    console.log('res', res);
+
+    console.log(recordType);
+    console.log(RecordType.SHORTSX.toLowerCase());
     if (recordType === RecordType.SHORTSX.toLowerCase()) {
       video.channelList = await this.getMetaInfo(res);
       console.log(res);
