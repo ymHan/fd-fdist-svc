@@ -472,7 +472,7 @@ export class VideoService {
   }
 
   async videoMake(payload: any): Promise<any> {
-    const { tempId, recordType, contents } = payload;
+    const { tempId, recordType } = payload;
     const video = await this.videoEntityRepository.findOne({
       where: { tempId, recordType: recordType.toUpperCase() },
       relations: ['user'],
@@ -483,7 +483,7 @@ export class VideoService {
     video.description = await this.makeTitles(video.nodeId, recordType);
     video.file_path = this.makeFilePath(video.user.email);
     video.video_files = await this.makeContents(tempId, recordType);
-    video.meta = await this.makeMeta(contents, recordType);
+    video.meta = await this.makeMeta(tempId, recordType);
     video.url = await this.getUrl(video.nodeId);
     video.thumbnail = await this.makeThumbnail(tempId, recordType);
 
@@ -497,7 +497,7 @@ export class VideoService {
     };
   }
 
-  async makeContents(tempId: string, recordType: string): Promise<string[]> {
+  async makeContents(tempId: string, recordType: string): Promise<Array<string>> {
     switch (recordType) {
       case RecordType.ASSISTS.toLowerCase(): {
         return [`${recordType}_center_${tempId}.mp4`, `${recordType}_left_${tempId}.mp4`, `${recordType}_right_${tempId}.mp4`];
@@ -511,7 +511,7 @@ export class VideoService {
     }
   }
 
-  async makeThumbnail(tempId: string, recordType: string): Promise<string[]> {
+  async makeThumbnail(tempId: string, recordType: string): Promise<Array<string>> {
     switch (recordType) {
       case RecordType.ASSISTS.toLowerCase(): {
         return [`${recordType}_center_${tempId}.jpg`, `${recordType}_left_${tempId}.jpg`, `${recordType}_right_${tempId}.jpg`];
@@ -532,14 +532,18 @@ export class VideoService {
     return venue.url;
   }
 
-  async makeMeta(contents: Array<string>, recordType: string): Promise<Array<string>> {
-    const meta = [];
-    if (recordType === RecordType.ASSISTS.toLowerCase()) {
-      for (const content of contents) {
-        meta.push(content.replace('mp4', 'json'));
+  async makeMeta(tempId: string, recordType: string): Promise<Array<string>> {
+    switch (recordType) {
+      case RecordType.ASSISTS.toLowerCase(): {
+        return [`${recordType}_center_${tempId}.json`, `${recordType}_left_${tempId}.json`, `${recordType}_right_${tempId}.json`];
+      }
+      case RecordType.SHORTS.toLowerCase(): {
+        return [];
+      }
+      case RecordType.SHORTSX.toUpperCase(): {
+        return [];
       }
     }
-    return meta;
   }
 
   makeFilePath(userEmail: string): string {
