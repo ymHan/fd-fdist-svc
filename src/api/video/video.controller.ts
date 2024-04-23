@@ -63,9 +63,14 @@ export class VideoController {
     return this.service.addTmpVideo(payload);
   }
 
-  @GrpcMethod(VIDEO_SERVICE_NAME, 'videoUpload')
-  private videoUpload(payload: any): Promise<any> {
-    return this.service.videoUpload(payload);
+  @GrpcMethod(VIDEO_SERVICE_NAME, 'videoMake')
+  private videoMake(payload: any): Promise<any> {
+    return this.service.videoMake(payload);
+  }
+
+  @GrpcMethod(VIDEO_SERVICE_NAME, 'videoDone')
+  private videoDone(payload: any): Promise<any> {
+    return this.service.videoDone(payload);
   }
 
   @GrpcMethod(VIDEO_SERVICE_NAME, 'ivpCallback')

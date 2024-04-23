@@ -448,8 +448,31 @@ export class VideoService {
     return { result };
   }
 
-  async videoUpload(payload: any): Promise<any> {
-    const { tempId, recordType, contents, duration, thumbnail } = payload;
+  async videoDone(payload: any): Promise<any> {
+    const { tempId, recordType } = payload;
+    const video = await this.videoEntityRepository.findOne({
+      where: { tempId, recordType: recordType.toUpperCase() },
+      relations: ['user'],
+    });
+
+    if (recordType === RecordType.SHORTSX.toLowerCase()) {
+      video.channelList = await this.getMetaInfo(video);
+      await this.makeIVP(video, video.channelList.length);
+    }
+
+    video.isStatus = true;
+    await this.videoEntityRepository.save(video);
+
+    return {
+      videoId: video.id,
+      userId: video.user.id,
+      tempId: video.tempId,
+      recordType: video.recordType,
+    };
+  }
+
+  async videoMake(payload: any): Promise<any> {
+    const { tempId, recordType, contents } = payload;
     const video = await this.videoEntityRepository.findOne({
       where: { tempId, recordType: recordType.toUpperCase() },
       relations: ['user'],
@@ -459,21 +482,10 @@ export class VideoService {
     video.sub_title = await this.makeTitles(video.nodeId, recordType);
     video.description = await this.makeTitles(video.nodeId, recordType);
     video.file_path = this.makeFilePath(video.user.email);
-    video.video_files = contents;
+    video.video_files = await this.makeContents(tempId, recordType);
     video.meta = await this.makeMeta(contents, recordType);
     video.url = await this.getUrl(video.nodeId);
-    video.duration = duration;
-    video.thumbnail = thumbnail;
-
-    await this.videoEntityRepository.save(video);
-
-    if (recordType === RecordType.SHORTSX.toLowerCase()) {
-      await this.makeIVP(video);
-      const rst = await this.getMetaInfo(video);
-      video.channelList = rst.channelList;
-    }
-
-    video.isStatus = true;
+    video.thumbnail = await this.makeThumbnail(tempId, recordType);
 
     await this.videoEntityRepository.save(video);
 
@@ -483,6 +495,34 @@ export class VideoService {
       tempId: video.tempId,
       recordType: video.recordType,
     };
+  }
+
+  async makeContents(tempId: string, recordType: string): Promise<string[]> {
+    switch (recordType) {
+      case RecordType.ASSISTS.toLowerCase(): {
+        return [`${recordType}_center_${tempId}.mp4`, `${recordType}_left_${tempId}.mp4`, `${recordType}_right_${tempId}.mp4`];
+      }
+      case RecordType.SHORTS.toLowerCase(): {
+        return [`shorts_${tempId}.mp4`];
+      }
+      case RecordType.SHORTSX.toUpperCase(): {
+        return [`shortsx_${tempId}.mp4`];
+      }
+    }
+  }
+
+  async makeThumbnail(tempId: string, recordType: string): Promise<string[]> {
+    switch (recordType) {
+      case RecordType.ASSISTS.toLowerCase(): {
+        return [`${recordType}_center_${tempId}.jpg`, `${recordType}_left_${tempId}.jpg`, `${recordType}_right_${tempId}.jpg`];
+      }
+      case RecordType.SHORTS.toLowerCase(): {
+        return [`shorts_${tempId}.jpg`];
+      }
+      case RecordType.SHORTSX.toUpperCase(): {
+        return [`shortsx_${tempId}.jpg`];
+      }
+    }
   }
 
   async getUrl(nodeId: string) {
@@ -522,7 +562,7 @@ export class VideoService {
     return channel.param.channel_list;
   }
 
-  async makeIVP(video: VideoEntity) {
+  async makeIVP(video: VideoEntity, arrLength: number) {
     const IVP_PATH = `${process.env.IVP_PATH}`;
     const src_file_path = `oss://kr-4d-4dist${video.file_path}`;
 
@@ -534,7 +574,7 @@ export class VideoService {
         codec_preset: {
           input: {
             vcodec: 'H.265',
-            channel_count: video.channelList.length,
+            channel_count: arrLength,
             path: '',
           },
           adaptive: [
