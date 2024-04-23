@@ -38,10 +38,10 @@ export class UserAccountEntity {
   @Column({ type: 'boolean', default: true })
   emailreceive: boolean;
 
-  @Column({ type: 'enum', name: 'state', enum: AccountStates, default: AccountStates.INACTIVE })
+  @Column({ type: 'enum', name: 'state', enum: AccountStates, default: AccountStates.ACTIVE })
   'state': AccountStates;
 
-  @Column({ type: 'boolean', default: false })
+  @Column({ type: 'boolean', default: true })
   isVerifiedEmail: boolean;
 
   @Column({ type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP' })
