@@ -450,7 +450,7 @@ export class VideoService {
 
   async videoDone(payload: any): Promise<any> {
     const { tempId, recordType, duration, thumbnail } = payload;
-    console.log(payload)
+    console.log(tempId, recordType, duration, thumbnail);
     const video = await this.videoEntityRepository.findOne({
       where: { tempId, recordType: recordType.toUpperCase() },
       relations: ['user'],
