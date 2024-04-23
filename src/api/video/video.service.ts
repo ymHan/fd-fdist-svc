@@ -450,7 +450,6 @@ export class VideoService {
 
   async videoDone(payload: any): Promise<any> {
     const { tempId, recordType, duration, thumbnail } = payload;
-    console.log(tempId, recordType, duration, thumbnail);
     const video = await this.videoEntityRepository.findOne({
       where: { tempId, recordType: recordType.toUpperCase() },
       relations: ['user'],
@@ -458,18 +457,19 @@ export class VideoService {
     video.duration = duration;
     video.thumbnail = thumbnail;
     video.isStatus = true;
-    await this.videoEntityRepository.save(video);
+    const res = await this.videoEntityRepository.save(video);
 
-    if (recordType.toUpperCase() === RecordType.SHORTSX) {
-      video.channelList = await this.getMetaInfo(video);
-      console.log(video);
-      await this.makeIVP(video, video.channelList.length);
+    if (recordType === RecordType.SHORTSX.toLowerCase()) {
+      video.channelList = await this.getMetaInfo(res);
+      console.log(res);
+      await this.makeIVP(res, res.channelList.length);
+      await this.videoEntityRepository.save(res);
     }
 
     return {
-      videoId: video.id,
-      userId: video.user.id,
-      tempId: video.tempId,
+      videoId: res.id,
+      userId: res.user.id,
+      tempId: res.tempId,
       recordType: video.recordType,
     };
   }
