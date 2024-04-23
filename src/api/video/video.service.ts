@@ -454,14 +454,14 @@ export class VideoService {
       where: { tempId, recordType: recordType.toUpperCase() },
       relations: ['user'],
     });
-
-    if (recordType === RecordType.SHORTSX.toLowerCase()) {
-      video.channelList = await this.getMetaInfo(video);
-      await this.makeIVP(video, video.channelList.length);
-    }
-
     video.isStatus = true;
     await this.videoEntityRepository.save(video);
+
+    if (recordType === RecordType.SHORTSX) {
+      video.channelList = await this.getMetaInfo(video);
+      console.log(video);
+      await this.makeIVP(video, video.channelList.length);
+    }
 
     return {
       videoId: video.id,
