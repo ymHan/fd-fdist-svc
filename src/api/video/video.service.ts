@@ -449,30 +449,28 @@ export class VideoService {
   }
 
   async videoUpload(payload: any): Promise<any> {
-    const { tempId, recordType, contents } = payload;
+    const { tempId, recordType, contents, duration, thumbnail } = payload;
     const video = await this.videoEntityRepository.findOne({
       where: { tempId, recordType: recordType.toUpperCase() },
       relations: ['user'],
     });
 
-    video.title = await this.makeTitles(video.nodeId);
-    video.sub_title = await this.makeTitles(video.nodeId);
-    video.description = await this.makeTitles(video.nodeId);
+    video.title = await this.makeTitles(video.nodeId, recordType);
+    video.sub_title = await this.makeTitles(video.nodeId, recordType);
+    video.description = await this.makeTitles(video.nodeId, recordType);
     video.file_path = this.makeFilePath(video.user.email);
     video.video_files = contents;
     video.meta = await this.makeMeta(contents, recordType);
     video.url = await this.getUrl(video.nodeId);
+    video.duration = duration;
+    video.thumbnail = thumbnail;
 
     await this.videoEntityRepository.save(video);
 
-    const rst = await this.getMetaInfo(video);
-
-    video.duration = rst.duration;
-    video.thumbnail = rst.thumbnail;
-    video.channelList = rst.channelList;
-
     if (recordType === RecordType.SHORTSX.toLowerCase()) {
-      this.makeIVP(video);
+      await this.makeIVP(video);
+      const rst = await this.getMetaInfo(video);
+      video.channelList = rst.channelList;
     }
 
     video.isStatus = true;
@@ -509,87 +507,19 @@ export class VideoService {
     return `/${userEmail}/${Dates}/video/`;
   }
 
-  async makeTitles(nodeId: string): Promise<string> {
+  async makeTitles(nodeId: string, recordType: string): Promise<string> {
     const venueId = nodeId.substring(10, 13);
     const venue = await this.venueRepository.findOne({ where: { id: venueId } });
-    return venue.name;
+    return `${venue.name} - ${recordType}`;
   }
 
   async getMetaInfo(video: VideoEntity) {
-    const metaFilePath = `${process.env.ORIGIN_FILE_ROOT}${video.file_path}meta.json`;
     const channelFilePath = `${process.env.ORIGIN_FILE_ROOT}${video.file_path.replace('video', 'json')}shortsx_${
       video.tempId
     }.json`;
-    const payload = {
-      tempId: video.tempId,
-      recordType: video.recordType,
-      metaFilePath,
-      channelFilePath,
-    };
 
-    return await this.getFileInfo(payload);
-  }
-
-  async getFileInfo(payload) {
-    const { tempId, recordType, metaFilePath, channelFilePath } = payload;
-    try {
-      const meta = JSON.parse(fs.readFileSync(metaFilePath, 'utf8'));
-
-      switch (recordType) {
-        case RecordType.ASSISTS: {
-          const metaInfo = {
-            duration: '',
-            thumbnail: [],
-            channelList: [],
-          };
-          metaInfo.thumbnail.push(`assists_left_${tempId}.jpg`);
-          metaInfo.thumbnail.push(`assists_center_${tempId}.jpg`);
-          metaInfo.thumbnail.push(`assists_right_${tempId}.jpg`);
-          metaInfo.duration = await this.searchMeta(metaInfo.thumbnail[0], meta).toString();
-          metaInfo.duration = await this.searchMeta(metaInfo.thumbnail[1], meta).toString();
-          metaInfo.duration = await this.searchMeta(metaInfo.thumbnail[2], meta).toString();
-
-          return metaInfo;
-        }
-        case RecordType.SHORTS: {
-          const metaInfo = {
-            duration: '',
-            thumbnail: [],
-            channelList: [],
-          };
-          metaInfo.thumbnail.push(`shorts_${tempId}.jpg`);
-          metaInfo.duration = this.searchMeta(metaInfo.thumbnail[0], meta).toString();
-
-          return metaInfo;
-        }
-        case RecordType.SHORTSX: {
-          const metaInfo = {
-            duration: '',
-            thumbnail: [],
-            channelList: [],
-          };
-          metaInfo.thumbnail.push(`shortsx_${tempId}.jpg`);
-          metaInfo.duration = this.searchMeta(metaInfo.thumbnail[0], meta).toString();
-          metaInfo.channelList = this.getChannel(channelFilePath);
-          return metaInfo;
-        }
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  getChannel(filePath) {
-    const channel = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    const channel = JSON.parse(fs.readFileSync(channelFilePath, 'utf8'));
     return channel.param.channel_list;
-  }
-
-  searchMeta(key, arr) {
-    for (let i = 0; i < arr.length; i++) {
-      if (arr[i].thumb === key) {
-        return arr[i].duration;
-      }
-    }
   }
 
   async makeIVP(video: VideoEntity) {
@@ -671,12 +601,12 @@ export class VideoService {
       },
     };
 
-    const ivp_msg = await this.axios_notify_to_mlmp(`${IVP_PATH}/post`, req_data);
+    const ivp_msg = await this.axios_notify(`${IVP_PATH}/post`, req_data);
 
     console.log('ivp_msg', ivp_msg);
   }
 
-  private axios_notify_to_mlmp(url: string, data) {
+  private axios_notify(url: string, data) {
     return new Promise((resolve, reject) => {
       axios
         .post(url, data)
