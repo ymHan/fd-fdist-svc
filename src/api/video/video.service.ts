@@ -647,7 +647,7 @@ export class VideoService {
         return_api: `https://api.4dist.com/v1/video/ivp/${video.id}`,
       },
     };
-
+    console.log(`${IVP_PATH}/post`);
     const ivp_msg = await this.axios_notify(`${IVP_PATH}/post`, req_data);
 
     console.log('ivp_msg', ivp_msg);
