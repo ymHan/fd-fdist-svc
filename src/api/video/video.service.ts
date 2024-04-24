@@ -590,7 +590,7 @@ export class VideoService {
         system_id: '0001A',
         codec_preset: {
           input: {
-            vcodec: 'H.265',
+            vcodec: 'H.264',
             channel_count: arrLength,
             path: '',
           },
