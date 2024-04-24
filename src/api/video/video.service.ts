@@ -462,12 +462,11 @@ export class VideoService {
 
     if (recordType === RecordType.SHORTSX.toLowerCase()) {
       video.channelList = await this.getMetaInfo(res);
-      console.log('channelList.length', res.channelList.length);
-      const ivp_result: any = await this.makeIVP(res, res.channelList.length, `${process.env.IVP_PATH}`);
-      if (res.tempId === 'bc67b5b7-21a5-4eab-b6b4-3e30ec19af75') {
+      const ivp_result: any = await this.makeIVP(res, res.channelList.length, `${process.env.IVP_PATH_OLD}`);
+      /*if (res.tempId === 'bc67b5b7-21a5-4eab-b6b4-3e30ec19af75') {
         const ivp_old_result: any = await this.makeIVP(res, res.channelList.length, `${process.env.IVP_PATH_OLD}`);
         console.log('ivp_old_result', ivp_old_result);
-      }
+      }*/
       if (ivp_result.result === 'fail') {
         console.log('ivp_result', ivp_result);
       } else {
