@@ -459,13 +459,9 @@ export class VideoService {
     video.isStatus = true;
 
     const res = await this.videoEntityRepository.save(video);
-    console.log('res', res);
 
-    console.log(recordType);
-    console.log(RecordType.SHORTSX.toLowerCase());
     if (recordType === RecordType.SHORTSX.toLowerCase()) {
       video.channelList = await this.getMetaInfo(res);
-      console.log(res);
       await this.makeIVP(res, res.channelList.length);
       await this.videoEntityRepository.save(res);
     }
