@@ -596,7 +596,7 @@ export class VideoService {
           },
           adaptive: [
             {
-              vcodec: 'H.265',
+              vcodec: 'H.264',
               width: 1920,
               fps: 29.97,
               gop: 30,
@@ -604,7 +604,7 @@ export class VideoService {
               height: 1080,
             },
             {
-              vcodec: 'H.265',
+              vcodec: 'H.264',
               width: 1280,
               fps: 29.97,
               gop: 30,
@@ -612,7 +612,7 @@ export class VideoService {
               height: 720,
             },
             {
-              vcodec: 'H.265',
+              vcodec: 'H.264',
               width: 854,
               fps: 29.97,
               gop: 30,
@@ -620,7 +620,7 @@ export class VideoService {
               height: 480,
             },
             {
-              vcodec: 'H.265',
+              vcodec: 'H.264',
               width: 1920,
               fps: 29.97,
               gop: 1,
@@ -628,7 +628,7 @@ export class VideoService {
               height: 1080,
             },
             {
-              vcodec: 'H.265',
+              vcodec: 'H.264',
               width: 1280,
               fps: 29.97,
               gop: 1,
@@ -636,7 +636,7 @@ export class VideoService {
               height: 720,
             },
             {
-              vcodec: 'H.265',
+              vcodec: 'H.264',
               width: 854,
               fps: 29.97,
               gop: 1,
