@@ -456,14 +456,25 @@ export class VideoService {
     });
     video.duration = duration;
     video.thumbnail = thumbnail;
-    video.isStatus = true;
+    recordType === RecordType.SHORTSX.toLowerCase() ? (video.isStatus = false) : (video.isStatus = true);
 
     const res = await this.videoEntityRepository.save(video);
 
     if (recordType === RecordType.SHORTSX.toLowerCase()) {
       video.channelList = await this.getMetaInfo(res);
-      await this.makeIVP(res, res.channelList.length);
-      await this.videoEntityRepository.save(res);
+      console.log('channelList.length', res.channelList.length);
+      const ivp_result: any = await this.makeIVP(res, res.channelList.length, `${process.env.IVP_PATH}`);
+      if (res.tempId === 'bc67b5b7-21a5-4eab-b6b4-3e30ec19af75') {
+        const ivp_old_result: any = await this.makeIVP(res, res.channelList.length, `${process.env.IVP_PATH_OLD}`);
+        console.log('ivp_old_result', ivp_old_result);
+      }
+      if (ivp_result.result === 'fail') {
+        console.log('ivp_result', ivp_result);
+      } else {
+        console.log('ivp_result', ivp_result);
+        res.isStatus = true;
+        await this.videoEntityRepository.save(res);
+      }
     }
 
     return {
@@ -569,8 +580,7 @@ export class VideoService {
     return channel.param.channel_list;
   }
 
-  async makeIVP(video: VideoEntity, arrLength: number) {
-    const IVP_PATH = `${process.env.IVP_PATH}`;
+  async makeIVP(video: VideoEntity, arrLength: number, IVP_PATH: string) {
     const src_file_path = `oss://kr-4d-4dist${video.file_path}`;
 
     const req_data = {
@@ -651,6 +661,8 @@ export class VideoService {
     const ivp_msg = await this.axios_notify(`${IVP_PATH}/post`, req_data);
 
     console.log('ivp_msg', ivp_msg);
+
+    return ivp_msg;
   }
 
   private axios_notify(url: string, data) {
