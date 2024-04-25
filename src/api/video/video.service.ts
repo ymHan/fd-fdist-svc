@@ -70,7 +70,7 @@ export class VideoService {
       };
     }
 
-    video.isDeleted = !video.isDeleted;
+    video.isDeleted = true;
     await this.videoEntityRepository.save(video);
 
     return {
