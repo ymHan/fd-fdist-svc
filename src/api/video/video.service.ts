@@ -653,7 +653,7 @@ export class VideoService {
     const ivp_msg = await this.axios_notify(`${IVP_PATH}/post`, req_data);
     const iVodProcess = new ivod_process_entity();
     iVodProcess.file_name = video.video_files[0];
-    iVodProcess.file_path = req_data.data.destination_prefix;
+    iVodProcess.file_path = req_data.data.destination_prefix.substring(1, req_data.data.destination_prefix.length);
     iVodProcess.return_api = req_data.data.return_api;
     const iVodResult = await this.ivodRepository.save(iVodProcess);
 
