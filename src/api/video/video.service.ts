@@ -346,7 +346,7 @@ export class VideoService {
     };
   }
 
-  //category를 분류한다.
+  //category 분류한다.
   getCategory(str: string): string {
     const cat = str.substring(0, 1);
     let category: string;
@@ -460,7 +460,7 @@ export class VideoService {
 
     const res = await this.videoEntityRepository.save(video);
 
-    if (recordType === RecordType.SHORTSX.toLowerCase()) {
+    if (RecordType.SHORTSX.toLowerCase() === recordType) {
       video.channelList = await this.getMetaInfo(res);
       const ivp_result: any = await this.makeIVP(res, res.channelList.length, `${process.env.IVP_PATH_OLD}`);
       /*if (res.tempId === 'bc67b5b7-21a5-4eab-b6b4-3e30ec19af75') {
@@ -570,7 +570,7 @@ export class VideoService {
     return `${venue.name} - ${recordType}`;
   }
 
-  async getMetaInfo(video: VideoEntity) {
+  async getMetaInfo(video) {
     const channelFilePath = `${process.env.ORIGIN_FILE_ROOT}${video.file_path.replace('video', 'json')}shortsx_${
       video.tempId
     }.json`;
@@ -579,7 +579,7 @@ export class VideoService {
     return channel.param.channel_list;
   }
 
-  async makeIVP(video: VideoEntity, arrLength: number, IVP_PATH: string) {
+  async makeIVP(video, arrLength: number, IVP_PATH: string) {
     const src_file_path = `oss://kr-4d-4dist${video.file_path}`;
 
     const req_data = {
@@ -652,7 +652,7 @@ export class VideoService {
           },
         },
         event_id: '0001A0001',
-        destination_prefix: `${video.file_path}ivod/C${video.id}`,
+        destination_prefix: `${video.file_path.replace('video', 'ivod')}/${video.id}`,
         return_api: `https://api.4dist.com/v1/video/ivp/${video.id}`,
       },
     };
@@ -664,7 +664,7 @@ export class VideoService {
     return ivp_msg;
   }
 
-  private axios_notify(url: string, data) {
+  private axios_notify(url: string, data: any) {
     return new Promise((resolve, reject) => {
       axios
         .post(url, data)
@@ -677,16 +677,49 @@ export class VideoService {
     });
   }
 
-  public async ivpVideo(id: number): Promise<any> {
-    const video = await this.videoEntityRepository.findOne({ where: { id } });
+  public async ivpVideo(id: number) {
+    const video = await this.videoEntityRepository.findOne({
+      where: { id },
+      relations: ['user'],
+    });
+    const url = video.url;
+    const path = video.file_path.replace('video', 'ivod');
+    let chLen = Math.round(video.channelList.length / 2).toString();
+    switch (chLen.length) {
+      case 1:
+        chLen = '00' + chLen;
+        break;
+      case 2:
+        chLen = '0' + chLen;
+        break;
+    }
+
+    const hls_url = `${url}${path}/${video.id}/${chLen}/master.m3u8`;
     video.isStatus = true;
+    video.video_files = [`${hls_url}`];
 
-    //await this.videoEntityRepository.save(video);
+    await this.videoEntityRepository.save(video);
 
-    return {
-      result: 'ok',
-      status: 200,
-      message: 'success',
+    const sendData = {
+      userId: video.user.id,
+      data: {
+        video: video.recordType,
+      },
     };
+
+    return await this.axios_instance('http://noti.4dist.com/push', sendData);
+  }
+
+  private axios_instance(url: string, data: any) {
+    return new Promise((resolve, reject) => {
+      axios
+        .post(url, data)
+        .then((response) => {
+          resolve(response.data);
+        })
+        .catch((error) => {
+          reject(error);
+        });
+    });
   }
 }
