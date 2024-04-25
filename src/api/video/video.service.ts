@@ -656,11 +656,8 @@ export class VideoService {
         return_api: `https://api.4dist.com/v1/video/ivp/${video.id}`,
       },
     };
-    console.log(`${IVP_PATH}/post`);
     const ivp_msg = await this.axios_notify(`${IVP_PATH}/post`, req_data);
-
     console.log('ivp_msg', ivp_msg);
-
     return ivp_msg;
   }
 
@@ -701,15 +698,15 @@ export class VideoService {
 
     await this.videoEntityRepository.save(video);
 
-    console.log(video.user.id)
     const sendData = {
       userId: video.user.id,
       data: {
         video: video.recordType,
       },
     };
-
-    return await this.axios_instance('http://noti.4dist.com/push', sendData);
+    const pushResult: any = await this.axios_instance(`http://noti.4dist.com/push`, sendData);
+    console.log(pushResult);
+    return pushResult;
   }
 
   private axios_instance(url: string, data: any) {
