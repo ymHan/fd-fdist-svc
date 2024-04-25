@@ -15,8 +15,8 @@ export class ivod_process_entity {
   return_api: string;
 
   @CreateDateColumn({ type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP' })
-  createdAt: Date;
+  createdat: Date;
 
   @UpdateDateColumn({ type: 'timestamp with time zone', nullable: true })
-  updatedAt: Date;
+  updatedat: Date;
 }

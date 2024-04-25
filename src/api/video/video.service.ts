@@ -655,9 +655,10 @@ export class VideoService {
     iVodProcess.file_name = video.video_files[0];
     iVodProcess.file_path = req_data.data.destination_prefix;
     iVodProcess.return_api = req_data.data.return_api;
-    await this.ivodRepository.save(iVodProcess);
+    const iVodResult = await this.ivodRepository.save(iVodProcess);
 
     console.log('ivp_msg', ivp_msg);
+    console.log('iVodProcess', iVodResult);
 
     return ivp_msg;
   }
