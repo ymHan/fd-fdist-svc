@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { Category, CategorySubEnum, RecordType, CategorySubCodeEnum } from '@enum/index';
-import { User, Video } from '@entities/index';
+import { User, Video, UserAccountEntity, VideoEntity } from '@entities/index';
 import { AddMwcRequest, ExistsMwcRequest, ExistsMwcResponse, UpdateVideoMetaInfoRequest } from '@proto/fdist.pb';
 import * as fs from 'fs';
 import * as fsp from 'fs/promises';
@@ -17,15 +17,16 @@ dotenv.config();
 
 @Injectable()
 export class MwcService {
-  @InjectRepository(Video)
-  private readonly videoRepository: Repository<Video>;
-
-  @InjectRepository(User)
-  private readonly userRepository: Repository<User>;
+  @InjectRepository(Video) private readonly videoRepository: Repository<Video>;
+  @InjectRepository(User) private readonly userRepository: Repository<User>;
+  @InjectRepository(UserAccountEntity) private readonly userAccountEntityRepository: Repository<UserAccountEntity>;
+  @InjectRepository(VideoEntity) private readonly videoEntityRepository: Repository<VideoEntity>;
 
   public async updateVideoMetaInfo(payload: UpdateVideoMetaInfoRequest): Promise<any> {
     const { userEmail, videoId, title, subTitle, description } = payload;
-    const video = await this.videoRepository.findOne({ where: { email: userEmail, id: videoId } });
+    const video = await this.videoEntityRepository.findOne({
+      where: { id: videoId }
+    });
     if (!video) {
       return {
         result: 'fail',
@@ -35,10 +36,10 @@ export class MwcService {
       };
     }
     !!title ? (video.title = title) : null;
-    !!subTitle ? (video.subTitle = subTitle) : null;
+    !!subTitle ? (video.sub_title = subTitle) : null;
     !!description ? (video.description = description) : null;
 
-    const result = await this.videoRepository.save(video);
+    const result = await this.videoEntityRepository.save(video);
     return {
       result: 'ok',
       status: 200,
