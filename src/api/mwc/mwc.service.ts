@@ -23,9 +23,9 @@ export class MwcService {
   @InjectRepository(VideoEntity) private readonly videoEntityRepository: Repository<VideoEntity>;
 
   public async updateVideoMetaInfo(payload: UpdateVideoMetaInfoRequest): Promise<any> {
-    const { userEmail, videoId, title, subTitle, description } = payload;
+    const { videoId, title, subTitle, description } = payload;
     const video = await this.videoEntityRepository.findOne({
-      where: { id: videoId }
+      where: { id: videoId },
     });
     if (!video) {
       return {
