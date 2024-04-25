@@ -6,13 +6,13 @@ export class ivod_process_entity {
   id: number; // 아이보드 프로세스 아이디
 
   @Column({ nullable: true })
-  file_name: string;
+  filename: string;
 
   @Column({ nullable: true })
-  file_path: string;
+  filepath: string;
 
   @Column({ nullable: true })
-  return_api: string;
+  returnapi: string;
 
   @CreateDateColumn({ type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP' })
   createdat: Date;

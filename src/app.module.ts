@@ -8,7 +8,7 @@ import { CategoryModule } from '@root/api/category';
 import { LikeModule } from '@root/api/like';
 
 // MWC 2024-04-01 현재 사용 안함
-// import { MwcModule } from '@root/api/mwc';
+import { MwcModule } from '@root/api/mwc';
 
 @Module({
   imports: [
@@ -21,7 +21,7 @@ import { LikeModule } from '@root/api/like';
     VideoModule,
     CategoryModule,
     LikeModule,
-    //MwcModule,
+    MwcModule,
   ],
 })
 export class AppModule {}
