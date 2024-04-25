@@ -5,13 +5,12 @@ import { VideoService } from './video.service';
 import {
   F_DIST_SERVICE_NAME,
   GetVideoByIdRequest,
-  GetVideoListRequest, TogglePublishedRequest,
+  GetVideoListRequest,
+  TogglePublishedRequest,
   TogglePublishedResponse,
   addTmpVideoRequest,
-  VideoUploadRequest,
   VIDEO_SERVICE_NAME,
 } from '@proto/fdist.pb';
-
 
 @Controller()
 export class VideoController {
@@ -73,8 +72,8 @@ export class VideoController {
     return this.service.videoDone(payload);
   }
 
-  @GrpcMethod(VIDEO_SERVICE_NAME, 'ivpCallback')
-  private ivpCallback(payload: any): Promise<any> {
+  @GrpcMethod(VIDEO_SERVICE_NAME, 'ivpVideo')
+  private ivpVideo(payload: any): Promise<any> {
     return this.service.ivpVideo(payload);
   }
 }

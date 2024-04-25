@@ -677,11 +677,12 @@ export class VideoService {
     });
   }
 
-  public async ivpVideo(id: number) {
+  public async ivpVideo(payload) {
     const video = await this.videoEntityRepository.findOne({
-      where: { id },
+      where: { id: payload.id },
       relations: ['user'],
     });
+    console.log(video)
     const url = video.url;
     const path = video.file_path.replace('video', 'ivod');
     let chLen = Math.round(video.channelList.length / 2).toString();
@@ -694,12 +695,13 @@ export class VideoService {
         break;
     }
 
-    const hls_url = `${url}${path}/${video.id}/${chLen}/master.m3u8`;
+    const hls_url = `${url}${path}${video.id}/${chLen}/master.m3u8`;
     video.isStatus = true;
     video.video_files = [`${hls_url}`];
 
     await this.videoEntityRepository.save(video);
 
+    console.log(video.user.id)
     const sendData = {
       userId: video.user.id,
       data: {
