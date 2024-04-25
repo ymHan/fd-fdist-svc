@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ReportEntity, VideoEntity, UserAccountEntity, VenueBackofficeEntity } from '@/model/entities';
+import { ReportEntity, VideoEntity, UserAccountEntity, VenueBackofficeEntity, ivod_process_entity } from '@/model/entities';
 import {
   GetVideoByIdRequest,
   GetVideoListRequest,
@@ -31,6 +31,7 @@ export class VideoService {
   @InjectRepository(VideoEntity) private readonly videoEntityRepository: Repository<VideoEntity>;
   @InjectRepository(ViewVideo) private readonly viewVideoRepository: Repository<ViewVideo>;
   @InjectRepository(VenueBackofficeEntity) private readonly venueRepository: Repository<VenueBackofficeEntity>;
+  @InjectRepository(ivod_process_entity) private readonly ivodRepository: Repository<ivod_process_entity>;
 
   public async togglePublished(payload: TogglePublishedRequest): Promise<TogglePublishedResponse> {
     const { videoId } = payload;
@@ -463,17 +464,10 @@ export class VideoService {
     if (RecordType.SHORTSX.toLowerCase() === recordType) {
       video.channelList = await this.getMetaInfo(res);
       const ivp_result: any = await this.makeIVP(res, res.channelList.length, `${process.env.IVP_PATH_OLD}`);
-      /*if (res.tempId === 'bc67b5b7-21a5-4eab-b6b4-3e30ec19af75') {
-        const ivp_old_result: any = await this.makeIVP(res, res.channelList.length, `${process.env.IVP_PATH_OLD}`);
-        console.log('ivp_old_result', ivp_old_result);
-      }*/
-      if (ivp_result.result === 'fail') {
-        console.log('ivp_result', ivp_result);
-      } else {
-        console.log('ivp_result', ivp_result);
-        res.isStatus = true;
-        await this.videoEntityRepository.save(res);
-      }
+
+      console.log('ivp_result', ivp_result);
+      res.isStatus = true;
+      await this.videoEntityRepository.save(res);
     }
 
     return {
@@ -657,7 +651,14 @@ export class VideoService {
       },
     };
     const ivp_msg = await this.axios_notify(`${IVP_PATH}/post`, req_data);
+    const iVodProcess = new ivod_process_entity();
+    iVodProcess.file_name = video.video_files[0];
+    iVodProcess.file_path = req_data.data.destination_prefix;
+    iVodProcess.return_api = req_data.data.return_api;
+    await this.ivodRepository.save(iVodProcess);
+
     console.log('ivp_msg', ivp_msg);
+
     return ivp_msg;
   }
 
@@ -679,7 +680,7 @@ export class VideoService {
       where: { id: payload.id },
       relations: ['user'],
     });
-    console.log(video)
+    console.log(video);
     const url = video.url;
     const path = video.file_path.replace('video', 'ivod');
     let chLen = Math.round(video.channelList.length / 2).toString();

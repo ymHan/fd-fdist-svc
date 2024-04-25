@@ -20,6 +20,7 @@ export * from './backoffice/customer-backoffice.entity';
 export * from './backoffice/venue-backoffice.entity';
 export * from './backoffice/sector-venue-backoffice.entity';
 export * from './backoffice/country-backoffice.entity';
+export * from './backoffice/ivod-process.entity';
 
 // 영상 관련 엔티티
 export * from './video/video.entity';
