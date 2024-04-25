@@ -652,7 +652,7 @@ export class VideoService {
           },
         },
         event_id: '0001A0001',
-        destination_prefix: `${video.file_path.replace('video', 'ivod')}/${video.id}`,
+        destination_prefix: `${video.file_path.replace('video', 'ivod')}${video.id}`,
         return_api: `https://api.4dist.com/v1/video/ivp/${video.id}`,
       },
     };
