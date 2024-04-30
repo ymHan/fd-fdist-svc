@@ -15,5 +15,6 @@ export enum CategorySubEnum {
   BALLET = 'BALLET', // 발레
   DANCE = 'DANCE', // 댄스
   EVENT = 'EVENT', // 이벤트
-  SHORTTRACK = 'SHORTTRACK'
+  SHORTTRACK = 'SHORTTRACK',
+  UFC = 'UFC', // UFC
 }
