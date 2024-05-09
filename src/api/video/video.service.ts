@@ -555,7 +555,7 @@ export class VideoService {
 
   makeFilePath(userEmail: string): string {
     const Dates = dayjs(new Date()).format('YYYYMMDD');
-    return `${userEmail}/${Dates}/video/`;
+    return `/${userEmail}/${Dates}/video/`;
   }
 
   async makeTitles(nodeId: any, recordType: string): Promise<string> {
@@ -646,7 +646,7 @@ export class VideoService {
           },
         },
         event_id: '0001A0001',
-        destination_prefix: `${video.file_path.replace('video', 'ivod')}${video.id}`,
+        destination_prefix: `${video.file_path.replace('video', 'ivod').replace('/', '')}${video.id}`,
         return_api: `https://api.4dist.com/v1/video/ivp/${video.id}`,
       },
     };
