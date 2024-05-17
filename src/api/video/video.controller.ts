@@ -76,4 +76,9 @@ export class VideoController {
   private ivpVideo(payload: any): Promise<any> {
     return this.service.ivpVideo(payload);
   }
+
+  @GrpcMethod(VIDEO_SERVICE_NAME, 'ivpVideoP')
+  private ivpVideoP(payload: any): Promise<any> {
+    return this.service.ivpVideo(payload);
+  }
 }

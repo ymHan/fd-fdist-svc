@@ -655,10 +655,7 @@ export class VideoService {
     iVodProcess.filename = video.video_files[0];
     iVodProcess.filepath = req_data.data.destination_prefix.substring(1, req_data.data.destination_prefix.length);
     iVodProcess.returnapi = req_data.data.return_api;
-    const iVodResult = await this.ivodRepository.save(iVodProcess);
-
-    console.log('ivp_msg', ivp_msg);
-    console.log('iVodProcess', iVodResult);
+    await this.ivodRepository.save(iVodProcess);
 
     return ivp_msg;
   }
@@ -681,7 +678,7 @@ export class VideoService {
       where: { id: payload.id },
       relations: ['user'],
     });
-    console.log(video);
+
     const url = video.url;
     const path = video.file_path.replace('video', 'ivod');
     let chLen = Math.round(video.channelList.length / 2).toString();
