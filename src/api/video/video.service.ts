@@ -115,7 +115,6 @@ export class VideoService {
     const [videos, total] = await queryBuilder
       .where(`video.email = '${userEmail}'`)
       .andWhere(`video.isDeleted = false`)
-      .andWhere(`video.isStatus = true`)
       .skip((page - 1) * limit)
       .orderBy(`video.${sort}`, order.toUpperCase() as 'ASC' | 'DESC')
       .take(limit)
