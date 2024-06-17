@@ -27,6 +27,11 @@ export class VideoController {
     return this.service.getVideoById(payload);
   }
 
+  @GrpcMethod(F_DIST_SERVICE_NAME, 'getReportVideoType')
+  private getReportVideoType(): Promise<any> {
+    return this.service.getReportVideoType();
+  }
+
   @GrpcMethod(F_DIST_SERVICE_NAME, 'reportVideo')
   private reportVideo(payload: any): Promise<any> {
     return this.service.reportVideo(payload);

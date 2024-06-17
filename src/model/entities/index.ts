@@ -14,6 +14,7 @@ export * from './websocket/joined-room.websocket.entity';
 export * from './websocket/message.websocket.entity';
 
 // 백오피스
+export * from './backoffice/common-code-backoffice.entity';
 export * from './backoffice/commonCode-backoffice.entity';
 export * from './backoffice/item-details-backoffice.entity';
 export * from './backoffice/customer-backoffice.entity';

@@ -1,7 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ReportEntity, VideoEntity, UserAccountEntity, VenueBackofficeEntity, ivod_process_entity } from '@/model/entities';
+import {
+  ReportEntity,
+  VideoEntity,
+  UserAccountEntity,
+  VenueBackofficeEntity,
+  ivod_process_entity,
+  CommonCodeEntity,
+} from '@/model/entities';
 import {
   GetVideoByIdRequest,
   GetVideoListRequest,
@@ -15,6 +22,7 @@ import {
   TogglePublishedRequest,
   TogglePublishedResponse,
   addTmpVideoRequest,
+  GetReportTypeResponse,
 } from '@proto/fdist.pb';
 import { Category, CategorySubEnum, RecordType } from '@enum/index';
 import axios from 'axios';
@@ -32,6 +40,7 @@ export class VideoService {
   @InjectRepository(ViewVideo) private readonly viewVideoRepository: Repository<ViewVideo>;
   @InjectRepository(VenueBackofficeEntity) private readonly venueRepository: Repository<VenueBackofficeEntity>;
   @InjectRepository(ivod_process_entity) private readonly ivodRepository: Repository<ivod_process_entity>;
+  @InjectRepository(CommonCodeEntity) private readonly commonCodeRepository: Repository<CommonCodeEntity>;
 
   public async togglePublished(payload: TogglePublishedRequest): Promise<TogglePublishedResponse> {
     const { videoId } = payload;
@@ -322,13 +331,57 @@ export class VideoService {
     };
   }
 
+  async getReportVideoType(): Promise<GetReportTypeResponse> {
+    const checkReportType = await this.commonCodeRepository.find({
+      where: { groupCode: 'RPKD' },
+      select: ['code', 'name', 'isDeleted'],
+    });
+
+    return {
+      result: 'ok',
+      status: 200,
+      message: 'success',
+      data: checkReportType,
+    };
+  }
+
   async reportVideo(payload: ReportVideoRequest): Promise<ReportVideoResponse> {
+    const reportsType = payload.reportType;
+
+    if (!reportsType) {
+      return {
+        result: 'fail',
+        status: 404,
+        message: 'fail',
+        data: [
+          {
+            result: false,
+          },
+        ],
+      };
+    }
+
+    const checkExists = await this.commonCodeRepository.findOne({
+      where: { groupCode: 'RPKD', code: String(reportsType) },
+    });
+
+    if (!checkExists) {
+      return {
+        result: 'fail',
+        status: 404,
+        message: 'fail',
+        data: [
+          {
+            result: false,
+          },
+        ],
+      };
+    }
+
     const report = new ReportEntity();
     report.userId = payload.userId;
     report.videoId = payload.videoId;
-    report.reportType = payload.reportType;
-    report.report = payload.report;
-
+    report.commoncode = checkExists;
     await this.reportRepository.save(report);
 
     const video = await this.videoEntityRepository.findOne({ where: { id: payload.videoId } });
