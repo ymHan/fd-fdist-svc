@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { VideoEntity } from '@/model/entities';
+import { VideoEntity, CommonCodeEntity } from '@/model/entities';
 
 @Entity()
 export class ReportEntity {
@@ -12,11 +12,11 @@ export class ReportEntity {
   @Column()
   videoId: number;
 
-  @Column()
-  reportType: number;
+  // @Column()
+  // reportType: number;
 
-  @Column()
-  report: string;
+  // @Column()
+  // report: string;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -24,4 +24,8 @@ export class ReportEntity {
   @ManyToOne(() => VideoEntity, (video) => video.reports)
   @JoinColumn()
   video: VideoEntity;
+
+  @ManyToOne(() => CommonCodeEntity, (commoncode) => commoncode.code)
+  @JoinColumn()
+  commoncode: CommonCodeEntity;
 }
