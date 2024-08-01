@@ -12,7 +12,7 @@ export = [
     username: process.env.DEFAULT_DB_USER,
     password: process.env.DEFAULT_DB_PASSWORD,
     entities: ['dist/**/*.entity{.ts,.js}'],
-    synchronize: false,
+    synchronize: true,
   } as TypeOrmModuleOptions,
   {
     name: process.env.SECOND_DB_NAME,
