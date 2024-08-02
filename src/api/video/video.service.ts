@@ -515,8 +515,8 @@ export class VideoService {
     const res = await this.videoEntityRepository.save(video);
 
     if (RecordType.SHORTSX.toLowerCase() === recordType) {
-      video.channelList = await this.getMetaInfo(res); // 카메라 채널 수를 가져온다.
-      const ivp_result: any = await this.makeIVP(res, res.channelList.length, `${process.env.IVP_PATH_OLD}`);
+      //video.channelList = await this.getMetaInfo(res); // 카메라 채널 수를 가져온다.
+      //const ivp_result: any = await this.makeIVP(res, res.channelList.length, `${process.env.IVP_PATH_OLD}`);
 
       console.log('ivp_result', ivp_result);
       res.isStatus = true;
