@@ -547,6 +547,7 @@ export class VideoService {
     video.meta = await this.makeMeta(tempId, recordType);
     video.url = await this.getUrl(video.nodeId);
     video.thumbnail = await this.makeThumbnail(tempId, recordType);
+    video.isStatus = true;
 
     await this.videoEntityRepository.save(video);
 
