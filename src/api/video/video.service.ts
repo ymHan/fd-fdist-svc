@@ -510,7 +510,8 @@ export class VideoService {
     });
     video.duration = duration;
     video.thumbnail = thumbnail;
-    recordType === RecordType.SHORTSX.toLowerCase() ? (video.isStatus = false) : (video.isStatus = true);
+    //recordType === RecordType.SHORTSX.toLowerCase() ? (video.isStatus = false) : (video.isStatus = true);
+    video.isStatus = true;
 
     const res = await this.videoEntityRepository.save(video);
 
@@ -519,7 +520,7 @@ export class VideoService {
       //const ivp_result: any = await this.makeIVP(res, res.channelList.length, `${process.env.IVP_PATH_OLD}`);
 
       //console.log('ivp_result', ivp_result);
-      res.isStatus = true;
+      //res.isStatus = true;
       await this.videoEntityRepository.save(res);
     }
 
